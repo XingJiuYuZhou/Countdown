@@ -16,7 +16,6 @@
             --text-muted: rgba(255, 255, 255, 0.85);
             --accent-glow: rgba(76, 117, 230, 0.4);
             --card-bg: rgba(20, 30, 60, 0.6);
-            /* 新增：标题文字渐变的基础色，跟随text-main */
             --title-gradient-from: var(--text-main);
             --title-gradient-to: rgba(255,255,255,0.8);
         }
@@ -63,6 +62,7 @@
             overflow: hidden;
             position: relative;
             background-color: #0f172a;
+            padding: 1rem; /* 避免内容贴边 */
         }
 
         /* 动态Canvas背景层 */
@@ -75,7 +75,7 @@
             z-index: 0;
         }
 
-        /* 玻璃拟态主卡片 */
+        /* 玻璃拟态主卡片 - 基础样式 */
         .glass-card {
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -91,6 +91,9 @@
             transform: translateY(0);
             transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.5s;
             color: var(--text-main);
+            width: 100%;
+            max-width: 500px; /* 竖屏最大宽度 */
+            padding: 2rem;
         }
 
         /* 翻牌时钟样式 */
@@ -105,10 +108,10 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             overflow: hidden;
             font-family: 'Roboto Mono', monospace;
-            cursor: pointer; /* 新增：鼠标指针样式 */
+            cursor: pointer;
         }
 
-        /* 新增：时分秒点击动效 */
+        /* 时分秒点击动效 */
         .flip-clock.clicked {
             animation: clockClick 0.5s ease-in-out;
         }
@@ -141,7 +144,7 @@
             100% { transform: rotateX(0); }
         }
 
-        /* 标题字体样式 - 修改为跟随主题变量 */
+        /* 标题字体样式 */
         .title-calligraphy {
             font-family: 'Noto Sans SC', "PingFang SC", "Microsoft YaHei", sans-serif;
             font-size: 2.2rem;
@@ -150,13 +153,11 @@
             text-shadow: 
                 0 4px 12px rgba(0,0,0,0.3),
                 0 0 40px var(--accent-glow);
-            /* 关键修改：使用主题变量作为渐变色 */
             background: linear-gradient(to bottom, var(--title-gradient-from), var(--title-gradient-to));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 0.5rem;
-            /* 确保过渡动画生效 */
             transition: all 0.5s ease;
         }
 
@@ -284,7 +285,7 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* 新增：时间激励语浮层 */
+        /* 时间激励语浮层 */
         .time-motivation {
             position: fixed;
             bottom: 80px;
@@ -330,6 +331,90 @@
         #dayLabel {
             transition: all 0.3s ease;
         }
+
+        /* ========== 横屏适配样式 ========== */
+        @media (orientation: landscape) {
+            body {
+                align-items: center;
+                padding: 1rem 2rem;
+            }
+
+            /* 横屏主卡片：宽屏布局 */
+            .glass-card {
+                max-width: 90%;
+                max-height: 90vh;
+                padding: 2rem 3rem;
+            }
+
+            /* 横屏内容分栏 */
+            .main-content-wrapper {
+                display: flex;
+                gap: 3rem;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* 左侧：倒计时核心 */
+            .countdown-column {
+                flex: 1;
+                text-align: center;
+            }
+
+            /* 右侧：功能区 */
+            .function-column {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            /* 横屏优化字体和间距 */
+            .title-calligraphy {
+                font-size: 1.8rem;
+                margin-bottom: 0.3rem;
+            }
+
+            .flip-clock {
+                width: 50px;
+                height: 60px;
+            }
+
+            .flip-clock-inner {
+                font-size: 28px;
+                line-height: 60px;
+            }
+
+            #dayNum {
+                font-size: 5rem !important;
+            }
+
+            /* 横屏番茄钟优化 */
+            #pomodoroLayer {
+                padding: 2rem;
+            }
+
+            #pomodoroLayer .relative.w-48.h-48 {
+                width: 120px;
+                height: 120px;
+            }
+
+            #pomoTime {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* ========== 主观题/客观题切换按钮样式 ========== */
+        .exam-switch-btn {
+            text-xs px-2 py-1 rounded-full border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)];
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .exam-switch-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -338,110 +423,126 @@
     <canvas id="bgCanvas"></canvas>
 
     <!-- 主容器 -->
-    <div class="relative w-full max-w-md mx-auto p-4">
+    <div class="relative w-full mx-auto">
         
         <!-- 主卡片 -->
-        <div class="glass-card p-6 md:p-8" id="mainCard">
+        <div class="glass-card" id="mainCard">
             
-            <!-- 顶部：标题与主题切换 -->
+            <!-- 顶部：标题与功能按钮 -->
             <div class="text-center mb-6">
                 <h1 class="title-calligraphy">
                     2026法律职业资格考试
                 </h1>
-                <div class="flex justify-center items-center gap-2 mt-2">
+                <div class="flex justify-center items-center gap-2 mt-2 flex-wrap">
                     <span id="examPhase" class="text-xs px-3 py-1 rounded-full bg-[var(--primary-color)] text-white opacity-90">
                         客观题备考中
                     </span>
+                    <!-- 新增：主观题/客观题切换按钮 -->
+                    <div class="flex rounded-full border border-[var(--glass-border)] overflow-hidden">
+                        <button id="objBtn" class="exam-switch-btn active text-xs px-2 py-1" onclick="switchExamType(true)">
+                            客观题
+                        </button>
+                        <button id="subBtn" class="exam-switch-btn text-xs px-2 py-1" onclick="switchExamType(false)">
+                            主观题
+                        </button>
+                    </div>
                     <button onclick="switchTheme()" class="text-xs px-2 py-1 rounded-full border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)]">
                         切换主题
                     </button>
                 </div>
             </div>
 
-            <!-- 名言区域 -->
-            <div class="poem-container relative mb-6 cursor-pointer select-none" id="poemContainer">
-                <div class="absolute top-0 left-0 text-4xl opacity-20 font-serif">"</div>
-                <p id="poemText" class="text-center text-lg md:text-xl font-serif italic text-[var(--text-main)] py-2 px-6 leading-relaxed">
-                    千淘万漉虽辛苦，吹尽狂沙始到金
-                </p>
-                <div class="absolute bottom-0 right-0 text-4xl opacity-20 font-serif rotate-180">"</div>
-            </div>
-
-            <!-- 倒计时主体 -->
-            <div class="countdown-section text-center mb-8">
-                <div class="text-sm text-[var(--text-muted)] mb-4 tracking-widest uppercase" id="countdownTitle">
-                    距客观题考试还有
-                </div>
-                
-                <!-- 天数/周数切换区域 -->
-                <div class="mb-6" onclick="toggleDayWeek()">
-                    <div class="text-6xl md:text-7xl font-bold font-sans text-[var(--text-main)] tracking-tighter" id="dayNum" style="text-shadow: 0 4px 20px var(--accent-glow);">
-                        0
+            <!-- 横屏分栏容器 -->
+            <div class="main-content-wrapper">
+                <!-- 左侧：倒计时核心 -->
+                <div class="countdown-column">
+                    <!-- 名言区域 -->
+                    <div class="poem-container relative mb-6 cursor-pointer select-none" id="poemContainer">
+                        <div class="absolute top-0 left-0 text-4xl opacity-20 font-serif">"</div>
+                        <p id="poemText" class="text-center text-lg md:text-xl font-serif italic text-[var(--text-main)] py-2 px-6 leading-relaxed">
+                            千淘万漉虽辛苦，吹尽狂沙始到金
+                        </p>
+                        <div class="absolute bottom-0 right-0 text-4xl opacity-20 font-serif rotate-180">"</div>
                     </div>
-                    <div class="text-sm text-[var(--text-muted)] mt-1 tracking-[0.5em] uppercase" id="dayLabel">天</div>
-                </div>
 
-                <!-- 时分秒 - 翻牌时钟 -->
-                <div class="flex justify-center items-center gap-3 md:gap-4">
-                    <div class="text-center">
-                        <div class="flip-clock" id="hourBox" onclick="clockClickEffect(this)">
-                            <div class="flip-clock-inner" id="hourVal">00</div>
+                    <!-- 倒计时主体 -->
+                    <div class="countdown-section text-center mb-8">
+                        <div class="text-sm text-[var(--text-muted)] mb-4 tracking-widest uppercase" id="countdownTitle">
+                            距客观题考试还有
                         </div>
-                        <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">时</div>
-                    </div>
-                    <div class="text-2xl font-bold text-[var(--text-main)] mb-6">:</div>
-                    <div class="text-center">
-                        <div class="flip-clock" id="minuteBox" onclick="clockClickEffect(this)">
-                            <div class="flip-clock-inner" id="minuteVal">00</div>
+                        
+                        <!-- 天数/周数切换区域 -->
+                        <div class="mb-6" onclick="toggleDayWeek()">
+                            <div class="text-6xl md:text-7xl font-bold font-sans text-[var(--text-main)] tracking-tighter" id="dayNum" style="text-shadow: 0 4px 20px var(--accent-glow);">
+                                0
+                            </div>
+                            <div class="text-sm text-[var(--text-muted)] mt-1 tracking-[0.5em] uppercase" id="dayLabel">天</div>
                         </div>
-                        <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">分</div>
-                    </div>
-                    <div class="text-2xl font-bold text-[var(--text-main)] mb-6">:</div>
-                    <div class="text-center">
-                        <div class="flip-clock" id="secondBox" onclick="clockClickEffect(this)">
-                            <div class="flip-clock-inner" id="secondVal">00</div>
+
+                        <!-- 时分秒 - 翻牌时钟 -->
+                        <div class="flex justify-center items-center gap-3 md:gap-4">
+                            <div class="text-center">
+                                <div class="flip-clock" id="hourBox" onclick="clockClickEffect(this)">
+                                    <div class="flip-clock-inner" id="hourVal">00</div>
+                                </div>
+                                <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">时</div>
+                            </div>
+                            <div class="text-2xl font-bold text-[var(--text-main)] mb-6">:</div>
+                            <div class="text-center">
+                                <div class="flip-clock" id="minuteBox" onclick="clockClickEffect(this)">
+                                    <div class="flip-clock-inner" id="minuteVal">00</div>
+                                </div>
+                                <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">分</div>
+                            </div>
+                            <div class="text-2xl font-bold text-[var(--text-main)] mb-6">:</div>
+                            <div class="text-center">
+                                <div class="flip-clock" id="secondBox" onclick="clockClickEffect(this)">
+                                    <div class="flip-clock-inner" id="secondVal">00</div>
+                                </div>
+                                <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">秒</div>
+                            </div>
                         </div>
-                        <div class="text-xs text-[var(--text-muted)] mt-2 tracking-widest">秒</div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 里程碑进度 -->
-            <div class="mb-8 px-2">
-                <div class="flex justify-between text-xs text-[var(--text-muted)] mb-2">
-                    <span>基础阶段</span>
-                    <span>强化阶段</span>
-                    <span>冲刺阶段</span>
-                    <span>考试</span>
+                <!-- 右侧：功能区 -->
+                <div class="function-column">
+                    <!-- 里程碑进度 -->
+                    <div class="mb-6 px-2">
+                        <div class="flex justify-between text-xs text-[var(--text-muted)] mb-2">
+                            <span>基础阶段</span>
+                            <span>强化阶段</span>
+                            <span>冲刺阶段</span>
+                            <span>考试</span>
+                        </div>
+                        <div class="milestone-track">
+                            <div class="milestone-fill" id="milestoneFill" style="width: 0%"></div>
+                            <div class="milestone-node" style="left: 0%" data-index="0"></div>
+                            <div class="milestone-node" style="left: 33%" data-index="1"></div>
+                            <div class="milestone-node" style="left: 66%" data-index="2"></div>
+                            <div class="milestone-node active" style="left: 100%" data-index="3"></div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮区：仅保留专注模式 -->
+                    <button onclick="togglePomodoro()" class="btn-interactive flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] hover:bg-[var(--glass-bg)]/80">
+                        <svg class="w-5 h-5 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="text-sm font-medium">专注模式</span>
+                    </button>
+
+                    <!-- 法考加油按钮（集成音乐播放） -->
+                    <button onclick="toggleCheer()" id="cheerBtn" class="w-full py-4 rounded-2xl cheer-btn text-white font-bold tracking-[0.3em] shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 btn-interactive text-lg flex items-center justify-center gap-2">
+                        <span id="musicIcon">🎵</span>
+                        <span>法考加油</span>
+                    </button>
+
+                    <!-- 鼓励消息显示区 -->
+                    <div id="encourageMsg" class="mt-4 text-center text-sm font-serif text-[var(--text-main)] opacity-0 transition-opacity duration-500 h-6">
+                        坚持就是胜利！
+                    </div>
                 </div>
-                <div class="milestone-track">
-                    <div class="milestone-fill" id="milestoneFill" style="width: 0%"></div>
-                    <div class="milestone-node" style="left: 0%" data-index="0"></div>
-                    <div class="milestone-node" style="left: 33%" data-index="1"></div>
-                    <div class="milestone-node" style="left: 66%" data-index="2"></div>
-                    <div class="milestone-node active" style="left: 100%" data-index="3"></div>
-                </div>
-            </div>
-
-            <!-- 操作按钮区：仅保留专注模式 -->
-            <div class="flex justify-center mb-6">
-                <button onclick="togglePomodoro()" class="btn-interactive flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] hover:bg-[var(--glass-bg)]/80">
-                    <svg class="w-5 h-5 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="text-sm font-medium">专注模式</span>
-                </button>
-            </div>
-
-            <!-- 法考加油按钮（集成音乐播放） -->
-            <button onclick="toggleCheer()" id="cheerBtn" class="w-full py-4 rounded-2xl cheer-btn text-white font-bold tracking-[0.3em] shadow-lg hover:shadow-xl transform transition hover:-translate-y-0.5 active:translate-y-0 btn-interactive text-lg flex items-center justify-center gap-2">
-                <span id="musicIcon">🎵</span>
-                <span>法考加油</span>
-            </button>
-
-            <!-- 鼓励消息显示区 -->
-            <div id="encourageMsg" class="mt-4 text-center text-sm font-serif text-[var(--text-main)] opacity-0 transition-opacity duration-500 h-6">
-                坚持就是胜利！
             </div>
         </div>
 
@@ -449,7 +550,7 @@
         <div id="pomodoroLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center justify-center p-8">
             <h3 class="text-2xl font-bold text-[var(--text-main)] mb-4">专注时刻</h3>
             
-            <!-- 新增：番茄钟自定义时间输入框 -->
+            <!-- 番茄钟自定义时间输入框 -->
             <div class="mb-6 flex items-center justify-center gap-2">
                 <input type="number" id="pomoCustomTime" min="1" max="60" placeholder="自定义分钟数" 
                        class="w-24 px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] text-center">
@@ -485,7 +586,7 @@
     <!-- 提示消息 -->
     <div class="toast" id="toast"></div>
     
-    <!-- 新增：时间激励语浮层 -->
+    <!-- 时间激励语浮层 -->
     <div class="time-motivation" id="timeMotivation"></div>
 
     <script>
@@ -522,7 +623,7 @@
             "心之所向，素履以往！"
         ];
 
-        // 新增：与时间相关的激励语
+        // 与时间相关的激励语
         const TIME_MOTIVATIONS = [
             "每一分钟的努力，都让你离成功更近",
             "珍惜时间，就是珍惜未来的自己",
@@ -545,20 +646,19 @@
             bgMode: 0,
             poemIndex: 0,
             isPlaying: false, // 音乐播放状态
-            isObjective: true,
+            isObjective: true, // 默认为客观题
             pomoRunning: false,
             pomoTime: 25 * 60, // 番茄钟秒数
-            pomoOriginalTime: 25 * 60, // 保存原始时间（默认25分钟，支持自定义）
+            pomoOriginalTime: 25 * 60, // 保存原始时间
             pomoInterval: null,
-            showWeek: false // 新增：是否显示周数（默认显示天数）
-            // 移除：motivationTimer 定时器变量
+            showWeek: false // 是否显示周数（默认显示天数）
         };
 
-        // 音频相关 - 替换为指定MP3地址，设置循环播放
+        // 音频相关 - 循环播放
         let cheerAudio = new Audio('https://xingjiuyuzhou.github.io/Countdown/jxszf.mp3');
-        cheerAudio.loop = true; // 循环播放
+        cheerAudio.loop = true;
 
-        // 从localStorage读取
+        // 从localStorage读取（新增：读取考试类型切换状态）
         const saved = localStorage.getItem('fakao2026_settings');
         if (saved) {
             const data = JSON.parse(saved);
@@ -566,6 +666,7 @@
             currentState.bgMode = data.bgMode || 0;
             currentState.poemIndex = data.poemIndex || 0;
             currentState.showWeek = data.showWeek || false;
+            currentState.isObjective = data.isObjective !== undefined ? data.isObjective : true; // 读取考试类型
             // 加载保存的番茄钟自定义时间
             if (data.pomoOriginalTime) {
                 currentState.pomoOriginalTime = data.pomoOriginalTime;
@@ -577,6 +678,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             applyTheme(currentState.theme);
             initBackground();
+            // 初始化考试类型显示
+            updateExamTypeUI();
             updateCountdown();
             setInterval(updateCountdown, 1000);
             renderPoem();
@@ -585,10 +688,42 @@
             checkExamPhase();
             // 初始化番茄钟显示
             updatePomoDisplay();
-            // 初始化番茄钟提示文字
             updatePomoTipText();
-            // 移除：初始化时间激励语轮播的调用
         });
+
+        /* ========== 新增：主观题/客观题切换功能 ========== */
+        function switchExamType(isObjective) {
+            // 更新状态
+            currentState.isObjective = isObjective;
+            // 更新UI显示
+            updateExamTypeUI();
+            // 立即更新倒计时
+            updateCountdown();
+            // 更新里程碑进度
+            updateMilestone();
+            // 保存设置
+            saveSettings();
+            // 显示提示
+            showToast(`已切换至${isObjective ? '客观题' : '主观题'}倒计时`);
+            // 触发激励语显示
+            showRandomTimeMotivation();
+        }
+
+        // 更新考试类型相关UI
+        function updateExamTypeUI() {
+            const isObjective = currentState.isObjective;
+            // 更新按钮激活状态
+            document.getElementById('objBtn').classList.toggle('active', isObjective);
+            document.getElementById('subBtn').classList.toggle('active', !isObjective);
+            // 更新考试阶段文本
+            document.getElementById('examPhase').textContent = isObjective 
+                ? '客观题备考中' 
+                : '主观题备考中';
+            // 更新倒计时标题
+            document.getElementById('countdownTitle').textContent = isObjective 
+                ? '距客观题考试还有' 
+                : '距主观题考试还有';
+        }
 
         /* ========== 倒计时核心逻辑 ========== */
         function updateCountdown() {
@@ -597,15 +732,17 @@
             const diff = target - now;
 
             if (diff <= 0) {
-                if (currentState.isObjective) {
-                    currentState.isObjective = false;
-                    document.getElementById('examPhase').textContent = '主观题备考中';
-                    document.getElementById('countdownTitle').textContent = '距主观题考试还有';
-                    return;
-                } else {
-                    document.getElementById('dayNum').textContent = "00";
-                    return;
-                }
+                document.getElementById('dayNum').textContent = "0";
+                document.getElementById('hourVal').textContent = "00";
+                document.getElementById('minuteVal').textContent = "00";
+                document.getElementById('secondVal').textContent = "00";
+                document.getElementById('examPhase').textContent = currentState.isObjective 
+                    ? '客观题考试已结束' 
+                    : '主观题考试已结束';
+                document.getElementById('countdownTitle').textContent = currentState.isObjective 
+                    ? '客观题考试已结束' 
+                    : '主观题考试已结束';
+                return;
             }
 
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -613,7 +750,7 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            // 新增：根据状态显示天数或周数
+            // 根据状态显示天数或周数
             if (currentState.showWeek) {
                 const weeks = Math.ceil(days / 7); // 向上取整
                 document.getElementById('dayNum').textContent = weeks;
@@ -628,28 +765,21 @@
             flipNumber('secondVal', seconds);
         }
 
-        // 新增：切换天数/周数显示
+        // 切换天数/周数显示
         function toggleDayWeek() {
             currentState.showWeek = !currentState.showWeek;
-            // 保存设置
             saveSettings();
-            // 更新显示
             updateCountdown();
-            // 显示提示
             showToast(`已切换为${currentState.showWeek ? '周数' : '天数'}显示`);
-            // 触发激励语显示（仅点击时）
             showRandomTimeMotivation();
         }
 
-        // 新增：时分秒点击动效
+        // 时分秒点击动效
         function clockClickEffect(element) {
-            // 添加动效类
             element.classList.add('clicked');
-            // 动画结束后移除类
             setTimeout(() => {
                 element.classList.remove('clicked');
             }, 500);
-            // 触发激励语显示（仅点击时）
             showRandomTimeMotivation();
         }
 
@@ -669,17 +799,22 @@
 
         function checkExamPhase() {
             const now = new Date().getTime();
-            if (now > EXAM_DATE_OBJ && now < EXAM_DATE_SUB) {
-                currentState.isObjective = false;
-                document.getElementById('examPhase').textContent = '主观题备考中';
-                document.getElementById('countdownTitle').textContent = '距主观题考试还有';
-            } else if (now > EXAM_DATE_SUB) {
-                document.getElementById('examPhase').textContent = '2026法考已结束';
-                document.getElementById('countdownTitle').textContent = '期待2027';
+            // 仅在用户未手动切换时，自动更新考试阶段
+            const savedData = localStorage.getItem('fakao2026_settings');
+            const hasManualSwitch = savedData && JSON.parse(savedData).isObjective !== undefined;
+            
+            if (!hasManualSwitch) {
+                if (now > EXAM_DATE_OBJ && now < EXAM_DATE_SUB) {
+                    currentState.isObjective = false;
+                    updateExamTypeUI();
+                } else if (now > EXAM_DATE_SUB) {
+                    document.getElementById('examPhase').textContent = '2026法考已结束';
+                    document.getElementById('countdownTitle').textContent = '期待2027';
+                }
             }
         }
 
-        /* ========== 里程碑计算 ========== */
+        /* ========== 里程碑计算（适配切换） ========== */
         function updateMilestone() {
             const now = new Date().getTime();
             const target = currentState.isObjective ? EXAM_DATE_OBJ : EXAM_DATE_SUB;
@@ -747,8 +882,9 @@
                 theme: currentState.theme,
                 bgMode: currentState.bgMode,
                 poemIndex: currentState.poemIndex,
-                pomoOriginalTime: currentState.pomoOriginalTime, // 保存番茄钟自定义时间
-                showWeek: currentState.showWeek // 保存天数/周数显示状态
+                pomoOriginalTime: currentState.pomoOriginalTime,
+                showWeek: currentState.showWeek,
+                isObjective: currentState.isObjective // 新增：保存考试类型状态
             }));
         }
 
@@ -914,14 +1050,13 @@
             }, {passive: false});
         }
 
-        /* ========== 法考加油按钮（MP3音乐播放+鼓励语） ========== */
+        /* ========== 法考加油按钮 ========== */
         function toggleCheer() {
             const btn = document.getElementById('cheerBtn');
             const icon = document.getElementById('musicIcon');
             
             // 切换音乐播放状态
             if (!currentState.isPlaying) {
-                // 开始播放MP3
                 cheerAudio.play().then(() => {
                     currentState.isPlaying = true;
                     btn.classList.add('playing');
@@ -932,7 +1067,6 @@
                     showToast('音乐播放失败，请稍后重试');
                 });
             } else {
-                // 暂停播放
                 cheerAudio.pause();
                 currentState.isPlaying = false;
                 btn.classList.remove('playing');
@@ -942,7 +1076,6 @@
             
             // 显示随机鼓励语
             showEncouragement();
-            // 移除：播放音乐时触发时间激励语
         }
 
         function showEncouragement() {
@@ -956,7 +1089,7 @@
             }, 3000);
         }
 
-        /* ========== 番茄钟功能（支持自定义时间） ========== */
+        /* ========== 番茄钟功能 ========== */
         function togglePomodoro() {
             const layer = document.getElementById('pomodoroLayer');
             if (layer.classList.contains('hidden-section')) {
@@ -971,21 +1104,21 @@
             }
         }
 
-        // 重置番茄钟（恢复为原始时间：默认25分钟或自定义时间）
+        // 重置番茄钟
         function resetPomodoro() {
             currentState.pomoTime = currentState.pomoOriginalTime;
             updatePomoDisplay();
             document.getElementById('pomoStartBtn').textContent = '开始';
         }
 
-        // 新增：更新番茄钟提示文字
+        // 更新番茄钟提示文字
         function updatePomoTipText() {
             const minutes = Math.floor(currentState.pomoOriginalTime / 60);
             const tipText = document.getElementById('pomoTipText');
             tipText.innerHTML = `保持专注，${minutes}分钟后短暂休息<br>法律人的自律从每一刻开始`;
         }
 
-        // 新增：设置番茄钟自定义时间
+        // 设置番茄钟自定义时间
         function setCustomPomodoroTime() {
             const input = document.getElementById('pomoCustomTime');
             const minutes = parseInt(input.value.trim());
@@ -1006,12 +1139,11 @@
             currentState.pomoOriginalTime = minutes * 60;
             currentState.pomoTime = minutes * 60;
             updatePomoDisplay();
-            // 新增：更新提示文字
             updatePomoTipText();
             document.getElementById('pomoStartBtn').textContent = '开始';
-            saveSettings(); // 保存到本地存储
+            saveSettings();
             showToast(`番茄钟时间已设为${minutes}分钟`);
-            input.value = ''; // 清空输入框
+            input.value = '';
         }
 
         function updatePomoDisplay() {
@@ -1028,14 +1160,12 @@
 
         function startPomodoro() {
             if (currentState.pomoRunning) {
-                // 暂停番茄钟
                 clearInterval(currentState.pomoInterval);
                 currentState.pomoRunning = false;
                 document.getElementById('pomoStartBtn').textContent = '继续';
                 return;
             }
             
-            // 开始/继续番茄钟
             currentState.pomoRunning = true;
             document.getElementById('pomoStartBtn').textContent = '暂停';
             
@@ -1044,19 +1174,17 @@
                     currentState.pomoTime--;
                     updatePomoDisplay();
                 } else {
-                    // 番茄钟结束
                     clearInterval(currentState.pomoInterval);
                     currentState.pomoRunning = false;
                     document.getElementById('pomoStartBtn').textContent = '完成';
                     showToast('专注时间结束！休息一下吧');
-                    // 移除：番茄钟结束时触发时间激励语
                     
-                    // 播放结束提示音（简易音效）
+                    // 播放结束提示音
                     try {
                         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                         const osc = audioContext.createOscillator();
                         const gain = audioContext.createGain();
-                        osc.frequency.value = 523.25; // C5音符
+                        osc.frequency.value = 523.25;
                         gain.gain.value = 0.1;
                         osc.connect(gain);
                         gain.connect(audioContext.destination);
@@ -1069,19 +1197,13 @@
             }, 1000);
         }
 
-        /* ========== 时间激励语功能（仅点击触发） ========== */
-        // 移除：initTimeMotivation 定时轮播函数
-        
+        /* ========== 时间激励语功能 ========== */
         function showRandomTimeMotivation() {
             const motivationEl = document.getElementById('timeMotivation');
-            // 随机选择一条激励语
             const randomMsg = TIME_MOTIVATIONS[Math.floor(Math.random() * TIME_MOTIVATIONS.length)];
             motivationEl.textContent = randomMsg;
-            
-            // 显示动画
             motivationEl.classList.add('show');
             
-            // 3秒后隐藏
             setTimeout(() => {
                 motivationEl.classList.remove('show');
             }, 5000);
@@ -1107,12 +1229,11 @@
             lastTouchEnd = now;
         }, false);
 
-        // 页面卸载时暂停音乐（移除定时器清理）
+        // 页面卸载时暂停音乐
         window.addEventListener('beforeunload', () => {
             if (cheerAudio) {
                 cheerAudio.pause();
             }
-            // 移除：清除motivationTimer的逻辑
         });
 
     </script>
