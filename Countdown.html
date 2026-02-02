@@ -19,8 +19,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 深邃的渐变：模拟法庭的庄重感 */
-            background: linear-gradient(135deg, #0c1e3c 0%, #1e3a5f 25%, #2c5282 50%, #1e3a5f 75%, #0c1e3c 100%);
+            /* 强化背景渐变对比度：更深的底色+更明显的明暗差 */
+            background: linear-gradient(135deg, #08162c 0%, #183054 25%, #254b7a 50%, #183054 75%, #08162c 100%);
             background-size: 400% 400%;
             animation: bgFlow 25s ease infinite;
             padding: 20px;
@@ -38,7 +38,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.03;
+            opacity: 0.05; /* 提升噪点对比度 */
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             pointer-events: none;
         }
@@ -53,13 +53,13 @@
         .countdown-card {
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%); /* 提升背景不透明度 */
+            border: 1px solid rgba(255, 255, 255, 0.25); /* 强化边框对比度 */
             border-radius: 32px;
             box-shadow: 
-                0 25px 50px -12px rgba(0, 0, 0, 0.25),
-                0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-                0 0 100px rgba(66, 153, 225, 0.1) inset;
+                0 25px 50px -12px rgba(0, 0, 0, 0.3), /* 加深阴影 */
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+                0 0 100px rgba(76, 161, 235, 0.2) inset;
             padding: 60px 50px;
             max-width: 520px;
             width: 100%;
@@ -75,9 +75,9 @@
         .countdown-card:hover {
             transform: translateY(-5px) scale(1.01);
             box-shadow: 
-                0 35px 70px -12px rgba(0, 0, 0, 0.35),
-                0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-                0 0 120px rgba(66, 153, 225, 0.2) inset;
+                0 35px 70px -12px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+                0 0 120px rgba(76, 161, 235, 0.3) inset;
         }
 
         .countdown-card:active {
@@ -89,7 +89,7 @@
         .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4); /* 提升涟漪对比度 */
             transform: scale(0);
             animation: ripple 0.8s linear;
             pointer-events: none;
@@ -110,7 +110,7 @@
             left: -100%;
             width: 50%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); /* 提升光效对比度 */
             animation: lightSlide 6s ease-in-out infinite;
             pointer-events: none;
         }
@@ -129,7 +129,7 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(66, 153, 225, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(76, 161, 235, 0.2) 0%, transparent 70%); /* 提升圆环对比度 */
             animation: rotate 30s linear infinite;
             pointer-events: none;
         }
@@ -141,12 +141,12 @@
 
         /* ========== 标题层级重构 ========== */
         .exam-title {
-            color: #ffffff;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             font-size: 36px;
             font-weight: 700;
             letter-spacing: 4px;
             margin-bottom: 24px;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 加深文字阴影 */
             font-family: 'Noto Serif SC', serif;
             position: relative;
             display: inline-block;
@@ -161,7 +161,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 3px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent); /* 提升下划线对比度 */
             border-radius: 2px;
         }
 
@@ -178,11 +178,11 @@
 
         .poem-container:hover {
             transform: scale(1.02);
-            background: rgba(0, 30, 60, 0.2);
+            background: rgba(0, 30, 60, 0.3); /* 提升hover背景对比度 */
         }
 
         .poem-text {
-            color: rgba(255, 255, 255, 0.95);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             font-size: 18px;
             font-weight: 400;
             letter-spacing: 3px;
@@ -192,6 +192,7 @@
             position: relative;
             z-index: 1;
             transition: opacity 0.5s ease;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* 增加文字阴影 */
         }
 
         .poem-container::before,
@@ -199,7 +200,7 @@
             content: """;
             position: absolute;
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.2); /* 提升引号对比度 */
             font-family: Georgia, serif;
             line-height: 1;
         }
@@ -216,7 +217,7 @@
         }
 
         .exam-subtitle {
-            color: rgba(255, 255, 255, 0.7);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             font-size: 14px;
             margin-bottom: 40px;
             letter-spacing: 3px;
@@ -225,13 +226,15 @@
             position: relative;
             display: inline-block;
             cursor: default;
+            opacity: 0.95; /* 高不透明度 */
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
         }
 
         .exam-subtitle::before,
         .exam-subtitle::after {
             content: "—";
             margin: 0 12px;
-            opacity: 0.5;
+            opacity: 0.8; /* 提升分隔符对比度 */
         }
 
         /* ========== 倒计时布局重构：视觉重心优化 ========== */
@@ -257,10 +260,10 @@
         .day-num {
             font-size: 80px;
             font-weight: 800;
-            color: #ffffff;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             line-height: 1;
             letter-spacing: -2px;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* 加深阴影 */
             font-family: 'Noto Sans SC', sans-serif;
             position: relative;
             padding: 0 20px;
@@ -270,7 +273,7 @@
 
         .day-num:hover {
             transform: scale(1.05);
-            text-shadow: 0 6px 25px rgba(66, 153, 225, 0.5);
+            text-shadow: 0 6px 25px rgba(76, 161, 235, 0.6); /* 加深hover阴影 */
         }
 
         /* 数字背后的光晕 */
@@ -281,19 +284,20 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 80px;
-            color: rgba(66, 153, 225, 0.3);
+            color: rgba(76, 161, 235, 0.4); /* 提升光晕对比度 */
             filter: blur(20px);
             z-index: -1;
         }
 
         .day-label {
             font-size: 18px;
-            color: rgba(255, 255, 255, 0.9);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             letter-spacing: 8px;
             margin-top: 12px;
             font-weight: 500;
             text-transform: uppercase;
             cursor: default;
+            opacity: 0.95; /* 高不透明度 */
         }
 
         /* 时分秒的紧凑布局 */
@@ -315,15 +319,15 @@
         .time-box {
             width: 70px;
             height: 70px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98); /* 接近纯白，提升对比 */
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 
-                0 8px 20px rgba(0, 0, 0, 0.1),
-                0 2px 6px rgba(0, 0, 0, 0.05),
-                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+                0 8px 20px rgba(0, 0, 0, 0.15), /* 加深阴影 */
+                0 2px 6px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.7) inset;
             position: relative;
             overflow: hidden;
             cursor: pointer;
@@ -334,11 +338,11 @@
         .time-box:hover {
             transform: translateY(-5px) scale(1.05);
             box-shadow: 
-                0 12px 25px rgba(0, 0, 0, 0.15),
-                0 4px 8px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.7) inset,
-                0 0 20px rgba(66, 153, 225, 0.3);
-            background: rgba(255, 255, 255, 0.98);
+                0 12px 25px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(255, 255, 255, 0.9) inset,
+                0 0 20px rgba(76, 161, 235, 0.4); /* 提升hover发光 */
+            background: #ffffff; /* 纯白背景 */
         }
 
         .time-box:active {
@@ -353,74 +357,84 @@
             left: 0;
             right: 0;
             height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 100%);
             pointer-events: none;
         }
 
         .time-value {
             font-size: 28px;
             font-weight: 700;
-            color: #1e3a5f;
+            color: #0a2463; /* 深蓝色，与白色背景形成强对比 */
             font-family: 'Noto Sans SC', sans-serif;
             z-index: 1;
         }
 
         .time-label {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             margin-top: 10px;
             letter-spacing: 2px;
             font-weight: 500;
             cursor: default;
+            opacity: 0.95; /* 高不透明度 */
         }
 
         /* 分隔点 */
         .separator {
             font-size: 24px;
-            color: rgba(255, 255, 255, 0.4);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             font-weight: 300;
             align-self: center;
             margin-top: -20px;
             animation: blink 2s ease-in-out infinite;
             cursor: default;
+            opacity: 0.8; /* 高不透明度 */
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
 
-        /* ========== 底部激励文字 ========== */
+        /* ========== 底部激励区域优化 ========== */
         .inspire-section {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2); /* 强化分隔线对比度 */
             position: relative;
             cursor: default;
         }
 
         .inspire-text {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
+            font-size: 17px;
             letter-spacing: 2px;
-            line-height: 2;
+            line-height: 1.8;
             font-family: 'Noto Serif SC', serif;
             cursor: default;
+            margin-bottom: 18px;
+            opacity: 0.95; /* 高不透明度 */
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
         }
 
+        /* 整合音频播放的法考加油按钮样式 - 强化对比度 */
         .fakao-cheer {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 12px 32px;
-            background: linear-gradient(135deg, rgba(66, 153, 225, 0.3), rgba(99, 179, 237, 0.3));
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding: 14px 36px;
+            /* 加深按钮背景渐变，提升对比度 */
+            background: linear-gradient(135deg, rgba(76, 161, 235, 0.5) 0%, rgba(106, 189, 245, 0.5) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.4); /* 强化边框对比度 */
             border-radius: 30px;
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 600;
-            color: #ffffff;
-            letter-spacing: 4px;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
+            letter-spacing: 5px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 加深阴影 */
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
@@ -429,14 +443,14 @@
         }
 
         .fakao-cheer:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 25px rgba(66, 153, 225, 0.4);
-            background: linear-gradient(135deg, rgba(66, 153, 225, 0.4), rgba(99, 179, 237, 0.4));
-            letter-spacing: 6px;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 30px rgba(76, 161, 235, 0.5); /* 强化hover发光 */
+            background: linear-gradient(135deg, rgba(76, 161, 235, 0.6) 0%, rgba(106, 189, 245, 0.6) 100%); /* 加深hover背景 */
+            letter-spacing: 7px;
         }
 
         .fakao-cheer:active {
-            transform: scale(0.95);
+            transform: scale(0.97);
         }
 
         .fakao-cheer::after {
@@ -446,7 +460,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: -1;
@@ -456,17 +470,28 @@
             opacity: 1;
         }
 
+        /* 播放状态的动画效果 */
+        .fakao-cheer.playing .music-icon {
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
         .cheer-message {
-            margin-top: 15px;
-            min-height: 28px;
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 16px;
+            margin-top: 18px;
+            min-height: 30px;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
+            font-size: 17px;
             font-weight: 500;
             letter-spacing: 2px;
             opacity: 0;
             transform: translateY(10px);
             transition: all 0.4s ease;
             font-family: 'Noto Serif SC', serif;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
         }
 
         .cheer-message.show {
@@ -485,25 +510,27 @@
             margin-bottom: 20px;
             display: block;
             cursor: default;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
         }
 
         .end-text {
             font-size: 28px;
-            color: #ffffff;
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             font-weight: 700;
             letter-spacing: 4px;
             line-height: 1.6;
             font-family: 'Noto Serif SC', serif;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 加深阴影 */
             cursor: default;
         }
 
         .end-sub {
             font-size: 16px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #ffffff; /* 纯黑对比纯白，最高对比度 */
             margin-top: 16px;
             letter-spacing: 2px;
             cursor: default;
+            opacity: 0.95; /* 高不透明度 */
         }
 
         /* ========== 响应式优化 ========== */
@@ -545,9 +572,22 @@
             }
             
             .fakao-cheer {
-                padding: 10px 24px;
-                font-size: 16px;
+                padding: 12px 28px;
+                font-size: 17px;
                 letter-spacing: 3px;
+                gap: 8px;
+            }
+
+            .fakao-cheer:hover {
+                letter-spacing: 5px;
+            }
+
+            .inspire-text {
+                font-size: 16px;
+            }
+
+            .cheer-message {
+                font-size: 16px;
             }
         }
 
@@ -569,13 +609,18 @@
         
         /* 鼓励消息脉冲效果 */
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(66, 153, 225, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(76, 161, 235, 0.5); } /* 提升脉冲对比度 */
+            70% { box-shadow: 0 0 0 12px rgba(76, 161, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 161, 235, 0); }
         }
         
         .pulse {
             animation: pulse 0.6s;
+        }
+
+        /* 隐藏的音频元素 */
+        #backgroundMusic {
+            display: none;
         }
     </style>
 </head>
@@ -595,10 +640,20 @@
 
         <div class="inspire-section">
             <p class="inspire-text">念念不忘，必有回响</p>
-            <div class="fakao-cheer" id="cheerBtn">法考加油</div>
+            <!-- 整合音频播放的法考加油按钮 -->
+            <div class="fakao-cheer" id="cheerBtn">
+                <span class="music-icon">🎵</span>
+                <span class="cheer-text">法考加油</span>
+            </div>
             <div class="cheer-message" id="cheerMessage"></div>
         </div>
     </div>
+
+    <!-- 隐藏的音频元素 -->
+    <audio id="backgroundMusic" preload="none">
+        <source type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
 
     <script>
         // 诗句库扩充
@@ -778,13 +833,6 @@
             }, 3000);
         }
 
-        // "法考加油"按钮点击事件
-        cheerBtn.addEventListener("click", function(e) {
-            e.stopPropagation();
-            const randomIndex = Math.floor(Math.random() * cheerMessages.length);
-            showCheerMessage(cheerMessages[randomIndex]);
-        });
-
         // 卡片点击涟漪效果
         mainCard.addEventListener("click", function(e) {
             // 创建涟漪元素
@@ -842,6 +890,58 @@
                     e.target.style.fontSize = "";
                     e.target.style.letterSpacing = "";
                 }, 2000);
+            }
+        });
+
+        // ========== 音频播放控制逻辑（整合到法考加油按钮） ==========
+        // 1. 获取音频元素和按钮
+        const audio = document.getElementById('backgroundMusic');
+        let isPlaying = false;
+        const musicIcon = cheerBtn.querySelector('.music-icon');
+
+        // 2. 替换为你的GitHub托管音乐文件URL（关键！）
+        // GitHub Pages URL格式示例：https://用户名.github.io/仓库名/音频文件名.mp3
+        audio.src = "https://xingjiuyuzhou.github.io/Countdown/jxszf.mp3";
+
+        // 3. 法考加油按钮点击事件：同时触发播放/暂停和鼓励语
+        cheerBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            
+            // 第一步：切换音频播放状态
+            if (isPlaying) {
+                // 暂停播放
+                audio.pause();
+                cheerBtn.classList.remove('playing');
+                musicIcon.textContent = '🎵';
+            } else {
+                // 开始播放（处理浏览器自动播放限制）
+                audio.play().catch(err => {
+                    console.error('音频播放失败:', err);
+                    alert('播放失败！原因可能：\n1. 浏览器禁止自动播放（需手动点击）\n2. 音乐文件URL错误\n3. 网络问题');
+                });
+                cheerBtn.classList.add('playing');
+                musicIcon.textContent = '🎶';
+            }
+            isPlaying = !isPlaying;
+
+            // 第二步：显示随机鼓励语
+            const randomIndex = Math.floor(Math.random() * cheerMessages.length);
+            showCheerMessage(cheerMessages[randomIndex]);
+        });
+
+        // 4. 音频播放结束后重置按钮状态
+        audio.addEventListener('ended', function() {
+            isPlaying = false;
+            cheerBtn.classList.remove('playing');
+            musicIcon.textContent = '🎵';
+        });
+
+        // 5. 页面隐藏时暂停音频，恢复时保持状态
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && isPlaying) {
+                audio.pause();
+            } else if (!document.hidden && isPlaying) {
+                audio.play();
             }
         });
     </script>
