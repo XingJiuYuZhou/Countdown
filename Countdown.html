@@ -18,6 +18,8 @@
             --card-bg: rgba(20, 30, 60, 0.6);
             --title-gradient-from: var(--text-main);
             --title-gradient-to: rgba(255,255,255,0.8);
+            /* 动效颜色变量 */
+            --effect-color: rgba(255, 255, 255, 0.8);
         }
 
         /* 主题：日出模式 */
@@ -31,6 +33,8 @@
             --card-bg: rgba(255, 240, 220, 0.6);
             --title-gradient-from: var(--text-main);
             --title-gradient-to: rgba(90, 61, 43, 0.8);
+            /* 日出模式动效颜色 - 提高对比度 */
+            --effect-color: rgba(200, 80, 20, 0.8);
         }
 
         /* 主题：护眼模式 */
@@ -44,6 +48,7 @@
             --card-bg: rgba(232, 245, 233, 0.7);
             --title-gradient-from: var(--text-main);
             --title-gradient-to: rgba(44, 74, 63, 0.8);
+            --effect-color: rgba(44, 74, 63, 0.8);
         }
 
         * {
@@ -410,7 +415,62 @@
             padding: 3px 8px;
             white-space: nowrap;
         }
+
+        /* ========== 修复视频/题库区顶部遮挡问题 ========== */
+        #videoAreaLayer {
+            justify-content: flex-start !important;
+            padding: 2rem 1rem !important;
+            max-height: 95vh !important;
+            margin: 1rem auto !important;
+        }
+
+        #questionBankLayer {
+            justify-content: flex-start !important;
+            padding: 2rem 1rem !important;
+            max-height: 95vh !important;
+            margin: 1rem auto !important;
+        }
+
+        /* 番茄钟提示文本样式优化 - 确保两行居中 */
+        #pomoTipText {
+            line-height: 1.8; /* 增加行高提升可读性 */
+            text-align: center !important; /* 强制居中 */
+            white-space: pre-line; /* 支持换行符 */
+        }
+    
+        /* 卡片进入动画 */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .course-card-enter {
+            animation: slideInUp 0.4s ease-out forwards;
+        }
+
+        /* 筛选按钮激活状态 */
+        .filter-btn.active,
+        .filter-btn-sub.active {
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        /* 机构图标悬停效果 */
+        .inst-icon {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .group:hover .inst-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -513,13 +573,26 @@
                 </div>
             </div>
 
-            <!-- 操作按钮区：仅保留专注模式 -->
-            <div class="flex justify-center mb-6">
+            <!-- 操作按钮区：新增视频学习、题库练习按钮 -->
+            <div class="flex justify-center mb-6 gap-3 flex-wrap">
                 <button onclick="togglePomodoro()" class="btn-interactive flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] hover:bg-[var(--glass-bg)]/80">
                     <svg class="w-5 h-5 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span class="text-sm font-medium">专注模式</span>
+                </button>
+                <button onclick="toggleVideoArea()" class="btn-interactive flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] hover:bg-[var(--glass-bg)]/80">
+                    <svg class="w-5 h-5 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-sm font-medium">视频学习</span>
+                </button>
+                <button onclick="toggleQuestionBank()" class="btn-interactive flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] hover:bg-[var(--glass-bg)]/80">
+                    <svg class="w-5 h-5 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <span class="text-sm font-medium">题库练习</span>
                 </button>
             </div>
 
@@ -566,8 +639,126 @@
                 </button>
             </div>
             <p class="mt-6 text-sm text-[var(--text-muted)] text-center" id="pomoTipText">
-                保持专注，25分钟后短暂休息<br>法律人的自律从每一刻开始
+                保持专注，25分钟后短暂休息
+                法律人的自律从每一刻开始
             </p>
+        </div>
+
+        <!-- 视频学习覆盖层 -->
+        <div id="videoAreaLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center p-8 overflow-y-auto"><div class="flex items-center justify-center gap-2 mb-4">
+                <svg class="w-6 h-6 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-2xl font-bold text-[var(--text-main)]">法考视频学习</h3>
+            </div>
+
+            <!-- 筛选栏 - 紧凑型设计 -->
+            <div class="w-full max-w-md mb-4 bg-[var(--glass-bg)] backdrop-blur-md p-3 rounded-xl border border-[var(--glass-border)] shadow-lg">
+                <!-- 头部：标题和重置 -->
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-[var(--primary-color)] bg-opacity-20 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-bold text-[var(--text-main)]">筛选课程</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-[var(--text-muted)]" id="courseStats">共 36 门</span>
+                        <button onclick="resetVideoFilters()" class="text-xs px-2 py-1 rounded-full bg-[var(--primary-color)] text-white hover:opacity-80 transition-opacity">
+                            重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 机构筛选 - 更紧凑 -->
+                <div class="mb-2">
+                    <div class="flex flex-wrap gap-1.5" id="institutionFilters">
+                        <button onclick="filterByInstitution('all')" class="filter-btn active px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] bg-[var(--primary-color)] text-white transition-all whitespace-nowrap flex items-center gap-1" data-filter="all">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>全部
+                        </button>
+                        <button onclick="filterByInstitution('众合教育')" class="filter-btn px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap flex items-center gap-1" data-filter="众合教育">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>众合
+                        </button>
+                        <button onclick="filterByInstitution('厚大法考')" class="filter-btn px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap flex items-center gap-1" data-filter="厚大法考">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>厚大
+                        </button>
+                        <button onclick="filterByInstitution('听过法考')" class="filter-btn px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap flex items-center gap-1" data-filter="听过法考">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>听过
+                        </button>
+                        <button onclick="filterByInstitution('瑞达法考')" class="filter-btn px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap flex items-center gap-1" data-filter="瑞达法考">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>瑞达
+                        </button>
+                        <button onclick="filterByInstitution('觉晓法考')" class="filter-btn px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap flex items-center gap-1" data-filter="觉晓法考">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>觉晓
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 科目筛选 - 更紧凑 -->
+                <div>
+                    <div class="flex flex-wrap gap-1.5" id="subjectFilters">
+                        <button onclick="filterBySubject('all')" class="filter-btn-sub active px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] bg-[var(--primary-color)] text-white transition-all whitespace-nowrap" data-filter="all">全部</button>
+                        <button onclick="filterBySubject('三国法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="三国法">三国</button>
+                        <button onclick="filterBySubject('刑法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="刑法">刑法</button>
+                        <button onclick="filterBySubject('刑诉法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="刑诉法">刑诉</button>
+                        <button onclick="filterBySubject('商经法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="商经法">商经</button>
+                        <button onclick="filterBySubject('商经知')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="商经知">商知</button>
+                        <button onclick="filterBySubject('民法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="民法">民法</button>
+                        <button onclick="filterBySubject('民诉法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="民诉法">民诉</button>
+                        <button onclick="filterBySubject('理论法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="理论法">理论</button>
+                        <button onclick="filterBySubject('行政法')" class="filter-btn-sub px-2 py-1 rounded-full text-xs border border-[var(--glass-border)] text-[var(--text-muted)] hover:bg-[var(--glass-bg)] transition-all whitespace-nowrap" data-filter="行政法">行政</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 课程卡片网格 -->
+            <div class="w-full max-w-md grid grid-cols-1 gap-4 pb-8" id="courseGrid">
+                <!-- 课程卡片由JS动态生成 -->
+            </div>
+
+            <button onclick="toggleVideoArea()" class="mt-4 px-8 py-3 rounded-full bg-gradient-to-r from-[var(--primary-color)] to-purple-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                关闭
+            </button></div>
+
+        <!-- 题库练习覆盖层 -->
+        <div id="questionBankLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center p-8 overflow-y-auto">
+            <h3 class="text-2xl font-bold text-[var(--text-main)] mb-6">法考题库练习</h3>
+            <div class="w-full max-w-md space-y-4">
+                <!-- 竹马 -->
+                <div class="bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all hover:shadow-lg hover:shadow-[var(--accent-glow)]">
+                    <h4 class="text-lg font-bold text-[var(--text-main)] mb-3">竹马</h4>
+                    <a href="https://www.zhumavip.com/w/questionBank" target="_blank" class="block w-full text-center py-2 rounded-lg bg-[var(--primary-color)] text-white text-sm hover:opacity-90 transition-opacity">
+                        进入题库练习
+                    </a>
+                </div>
+                <!-- 觉晓 -->
+                <div class="bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all hover:shadow-lg hover:shadow-[var(--accent-glow)]">
+                    <h4 class="text-lg font-bold text-[var(--text-main)] mb-3">觉晓</h4>
+                    <a href="https://www.juexiaotime.com/study?mockType=1" target="_blank" class="block w-full text-center py-2 rounded-lg bg-[var(--primary-color)] text-white text-sm hover:opacity-90 transition-opacity">
+                        进入题库练习
+                    </a>
+                </div>
+                <!-- 瑞达 -->
+                <div class="bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all hover:shadow-lg hover:shadow-[var(--accent-glow)]">
+                    <h4 class="text-lg font-bold text-[var(--text-main)] mb-3">瑞达</h4>
+                    <a href="https://www.ruidaedu.com/website/questionBank" target="_blank" class="block w-full text-center py-2 rounded-lg bg-[var(--primary-color)] text-white text-sm hover:opacity-90 transition-opacity">
+                        进入题库练习
+                    </a>
+                </div>
+                <!-- 厚大 -->
+                <div class="bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all hover:shadow-lg hover:shadow-[var(--accent-glow)]">
+                    <h4 class="text-lg font-bold text-[var(--text-main)] mb-3">厚大</h4>
+                    <a href="https://atk.houdask.com/hdapp/static/www/index.html" target="_blank" class="block w-full text-center py-2 rounded-lg bg-[var(--primary-color)] text-white text-sm hover:opacity-90 transition-opacity">
+                        进入题库练习
+                    </a>
+                </div>
+            </div>
+            <button onclick="toggleQuestionBank()" class="mt-8 px-8 py-3 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-main)] font-bold">
+                关闭
+            </button>
         </div>
 
     </div>
@@ -644,553 +835,24 @@
         };
 
         // 音频相关 - 循环播放
-        let cheerAudio = new Audio('https://xingjiuyuzhou.github.io/Countdown/jxszf.mp3');
-        cheerAudio.loop = true;
-
-        // 从localStorage读取（新增：读取考试类型切换状态）
-        const saved = localStorage.getItem('fakao2026_settings');
-        if (saved) {
-            const data = JSON.parse(saved);
-            currentState.theme = data.theme || 0;
-            currentState.bgMode = data.bgMode || 0;
-            currentState.poemIndex = data.poemIndex || 0;
-            currentState.showWeek = data.showWeek || false;
-            currentState.isObjective = data.isObjective !== undefined ? data.isObjective : true; // 读取考试类型
-            // 加载保存的番茄钟自定义时间
-            if (data.pomoOriginalTime) {
-                currentState.pomoOriginalTime = data.pomoOriginalTime;
-                currentState.pomoTime = data.pomoOriginalTime;
-            }
-        }
-
-        /* ========== 初始化 ========== */
-        document.addEventListener('DOMContentLoaded', () => {
-            applyTheme(currentState.theme);
-            initBackground();
-            // 初始化考试类型显示
-            updateExamTypeUI();
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
-            renderPoem();
-            updateMilestone();
-            initGestures();
-            checkExamPhase();
-            // 初始化番茄钟显示
-            updatePomoDisplay();
-            updatePomoTipText();
-        });
-
-        /* ========== 主观题/客观题切换功能 ========== */
-        function switchExamType(isObjective) {
-            // 更新状态
-            currentState.isObjective = isObjective;
-            // 更新UI显示
-            updateExamTypeUI();
-            // 立即更新倒计时
-            updateCountdown();
-            // 更新里程碑进度
-            updateMilestone();
-            // 保存设置
-            saveSettings();
-            // 显示提示
-            showToast(`已切换至${isObjective ? '客观题' : '主观题'}倒计时`);
-            // 触发激励语显示
-            showRandomTimeMotivation();
-        }
-
-        // 更新考试类型相关UI
-        function updateExamTypeUI() {
-            const isObjective = currentState.isObjective;
-            // 更新按钮激活状态
-            document.getElementById('objBtn').classList.toggle('active', isObjective);
-            document.getElementById('subBtn').classList.toggle('active', !isObjective);
-            // 更新考试阶段文本
-            document.getElementById('examPhase').textContent = isObjective 
-                ? '客观题备考中' 
-                : '主观题备考中';
-            // 更新倒计时标题
-            document.getElementById('countdownTitle').textContent = isObjective 
-                ? '距客观题考试还有' 
-                : '距主观题考试还有';
-        }
-
-        /* ========== 倒计时核心逻辑 ========== */
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const target = currentState.isObjective ? EXAM_DATE_OBJ : EXAM_DATE_SUB;
-            const diff = target - now;
-
-            if (diff <= 0) {
-                document.getElementById('dayNum').textContent = "0";
-                document.getElementById('hourVal').textContent = "00";
-                document.getElementById('minuteVal').textContent = "00";
-                document.getElementById('secondVal').textContent = "00";
-                document.getElementById('examPhase').textContent = currentState.isObjective 
-                    ? '客观题考试已结束' 
-                    : '主观题考试已结束';
-                document.getElementById('countdownTitle').textContent = currentState.isObjective 
-                    ? '客观题考试已结束' 
-                    : '主观题考试已结束';
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / (1000));
-
-            // 根据状态显示天数或周数
-            if (currentState.showWeek) {
-                const weeks = Math.ceil(days / 7); // 向上取整
-                document.getElementById('dayNum').textContent = weeks;
-                document.getElementById('dayLabel').textContent = '周';
-            } else {
-                document.getElementById('dayNum').textContent = days;
-                document.getElementById('dayLabel').textContent = '天';
-            }
-
-            flipNumber('hourVal', hours);
-            flipNumber('minuteVal', minutes);
-            flipNumber('secondVal', seconds);
-        }
-
-        // 切换天数/周数显示
-        function toggleDayWeek() {
-            currentState.showWeek = !currentState.showWeek;
-            saveSettings();
-            updateCountdown();
-            showToast(`已切换为${currentState.showWeek ? '周数' : '天数'}显示`);
-            showRandomTimeMotivation();
-        }
-
-        // 时分秒点击动效
-        function clockClickEffect(element) {
-            element.classList.add('clicked');
+        let audio = null;
+        
+        /* ========== 工具函数 ========== */
+        // 显示提示消息
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
             setTimeout(() => {
-                element.classList.remove('clicked');
-            }, 500);
-            showRandomTimeMotivation();
+                toast.classList.remove('show');
+            }, duration);
         }
 
-        function flipNumber(id, value) {
-            const el = document.getElementById(id);
-            const box = el.parentElement;
-            const newVal = String(value).padStart(2, '0');
-            
-            if (el.textContent !== newVal) {
-                box.classList.add('flipping');
-                setTimeout(() => {
-                    el.textContent = newVal;
-                    box.classList.remove('flipping');
-                }, 300);
-            }
-        }
-
-        function checkExamPhase() {
-            const now = new Date().getTime();
-            // 仅在用户未手动切换时，自动更新考试阶段
-            const savedData = localStorage.getItem('fakao2026_settings');
-            const hasManualSwitch = savedData && JSON.parse(savedData).isObjective !== undefined;
-            
-            if (!hasManualSwitch) {
-                if (now > EXAM_DATE_OBJ && now < EXAM_DATE_SUB) {
-                    currentState.isObjective = false;
-                    updateExamTypeUI();
-                } else if (now > EXAM_DATE_SUB) {
-                    document.getElementById('examPhase').textContent = '2026法考已结束';
-                    document.getElementById('countdownTitle').textContent = '期待2027';
-                }
-            }
-        }
-
-        /* ========== 里程碑计算（适配切换） ========== */
-        function updateMilestone() {
-            const now = new Date().getTime();
-            const target = currentState.isObjective ? EXAM_DATE_OBJ : EXAM_DATE_SUB;
-            const total = target - START_DATE;
-            const passed = now - START_DATE;
-            let percent = (passed / total) * 100;
-            percent = Math.max(0, Math.min(100, percent));
-            
-            document.getElementById('milestoneFill').style.width = percent + '%';
-            
-            const nodes = document.querySelectorAll('.milestone-node');
-            nodes.forEach((node, idx) => {
-                const threshold = idx * 33.3;
-                if (percent >= threshold) {
-                    node.classList.add('active');
-                } else {
-                    node.classList.remove('active');
-                }
-            });
-        }
-
-        /* ========== 名言系统 ========== */
-        function renderPoem() {
-            const p = POEMS[currentState.poemIndex];
-            document.getElementById('poemText').textContent = p.text;
-            document.getElementById('poemText').style.opacity = 0;
-            setTimeout(() => {
-                document.getElementById('poemText').style.transition = 'opacity 0.5s';
-                document.getElementById('poemText').style.opacity = 1;
-            }, 50);
-        }
-
-        function nextPoem() {
-            currentState.poemIndex = (currentState.poemIndex + 1) % POEMS.length;
-            renderPoem();
-            saveSettings();
-        }
-
-        function prevPoem() {
-            currentState.poemIndex = (currentState.poemIndex - 1 + POEMS.length) % POEMS.length;
-            renderPoem();
-            saveSettings();
-        }
-
-        document.getElementById('poemContainer').addEventListener('click', nextPoem);
-
-        /* ========== 主题与背景 ========== */
-        function switchTheme() {
-            currentState.theme = (currentState.theme + 1) % THEMES.length;
-            currentState.bgMode = (currentState.bgMode + 1) % BG_MODES.length;
-            applyTheme(currentState.theme);
-            initBackground();
-            saveSettings();
-            showToast(`已切换至${currentState.theme === 0 ? '深夜' : currentState.theme === 1 ? '日出' : '护眼'}模式`);
-        }
-
-        function applyTheme(index) {
-            document.body.setAttribute('data-theme', THEMES[index]);
-            const colors = ['#0f172a', '#ffecd2', '#e8f5e9'];
-            document.body.style.backgroundColor = colors[index];
-        }
-
-        function saveSettings() {
-            localStorage.setItem('fakao2026_settings', JSON.stringify({
-                theme: currentState.theme,
-                bgMode: currentState.bgMode,
-                poemIndex: currentState.poemIndex,
-                pomoOriginalTime: currentState.pomoOriginalTime,
-                showWeek: currentState.showWeek,
-                isObjective: currentState.isObjective // 保存考试类型状态
-            }));
-        }
-
-        /* ========== Canvas 动态背景系统 ========== */
-        let canvas, ctx, animationId;
-        let particles = [];
-
-        function initBackground() {
-            canvas = document.getElementById('bgCanvas');
-            ctx = canvas.getContext('2d');
-            resizeCanvas();
-            
-            if (animationId) cancelAnimationFrame(animationId);
-            
-            particles = [];
-            const mode = BG_MODES[currentState.bgMode];
-            
-            if (mode === 'stars') initStars();
-            else if (mode === 'rain') initRain();
-            else if (mode === 'ink') initInk();
-            
-            animate();
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-
-        function initStars() {
-            for (let i = 0; i < 100; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speedY: -Math.random() * 0.5 - 0.1,
-                    opacity: Math.random()
-                });
-            }
-        }
-
-        function initRain() {
-            for (let i = 0; i < 200; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    length: Math.random() * 20 + 10,
-                    speedY: Math.random() * 15 + 10,
-                    opacity: Math.random() * 0.5 + 0.1
-                });
-            }
-        }
-
-        function initInk() {
-            for (let i = 0; i < 30; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 100 + 50,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    opacity: Math.random() * 0.1
-                });
-            }
-        }
-
-        function animate() {
-            const mode = BG_MODES[currentState.bgMode];
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            if (mode === 'ink') {
-                ctx.fillStyle = currentState.theme === 2 ? 'rgba(232, 245, 233, 0.1)' : 'rgba(15, 23, 42, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-
-            particles.forEach(p => {
-                if (mode === 'stars') {
-                    p.y += p.speedY;
-                    if (p.y < 0) p.y = canvas.height;
-                    ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (mode === 'rain') {
-                    p.y += p.speedY;
-                    if (p.y > canvas.height) {
-                        p.y = -20;
-                        p.x = Math.random() * canvas.width;
-                    }
-                    ctx.strokeStyle = `rgba(174, 194, 224, ${p.opacity})`;
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x, p.y + p.length);
-                    ctx.stroke();
-                } else if (mode === 'ink') {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < -100 || p.x > canvas.width + 100) p.vx *= -1;
-                    if (p.y < -100 || p.y > canvas.height + 100) p.vy *= -1;
-                    
-                    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-                    const color = currentState.theme === 2 ? '100, 150, 130' : '100, 100, 120';
-                    grad.addColorStop(0, `rgba(${color}, ${p.opacity})`);
-                    grad.addColorStop(1, `rgba(${color}, 0)`);
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-            
-            animationId = requestAnimationFrame(animate);
-        }
-
-        /* ========== 手势支持 ========== */
-        function initGestures() {
-            let startX = 0;
-            let startY = 0;
-            let startDistance = 0;
-            
-            const card = document.getElementById('mainCard');
-            
-            card.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                } else if (e.touches.length === 2) {
-                    startDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                }
-            }, {passive: true});
-            
-            card.addEventListener('touchend', (e) => {
-                if (e.changedTouches.length === 1) {
-                    const endX = e.changedTouches[0].clientX;
-                    const diff = endX - startX;
-                    
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0) prevPoem();
-                        else nextPoem();
-                    }
-                }
-            }, {passive: true});
-            
-            card.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && startDistance > 0) {
-                    e.preventDefault();
-                    const currentDistance = Math.hypot(
-                        e.touches[0].clientX - e.touches[1].clientX,
-                        e.touches[0].clientY - e.touches[1].clientY
-                    );
-                    
-                    if (Math.abs(currentDistance - startDistance) > 50) {
-                        switchTheme();
-                        startDistance = 0;
-                    }
-                }
-            }, {passive: false});
-        }
-
-        /* ========== 法考加油按钮 ========== */
-        function toggleCheer() {
-            const btn = document.getElementById('cheerBtn');
-            const icon = document.getElementById('musicIcon');
-            
-            // 切换音乐播放状态
-            if (!currentState.isPlaying) {
-                cheerAudio.play().then(() => {
-                    currentState.isPlaying = true;
-                    btn.classList.add('playing');
-                    icon.textContent = '🎶';
-                    showToast('备考音乐已开启');
-                }).catch(err => {
-                    console.error('音乐播放失败:', err);
-                    showToast('音乐播放失败，请稍后重试');
-                });
-            } else {
-                cheerAudio.pause();
-                currentState.isPlaying = false;
-                btn.classList.remove('playing');
-                icon.textContent = '🎵';
-                showToast('备考音乐已暂停');
-            }
-            
-            // 显示随机鼓励语
-            showEncouragement();
-        }
-
-        function showEncouragement() {
-            const msg = ENCOURAGES[Math.floor(Math.random() * ENCOURAGES.length)];
-            const el = document.getElementById('encourageMsg');
-            el.textContent = msg;
-            el.classList.remove('opacity-0');
-            
-            setTimeout(() => {
-                el.classList.add('opacity-0');
-            }, 3000);
-        }
-
-        /* ========== 番茄钟功能 ========== */
-        function togglePomodoro() {
-            const layer = document.getElementById('pomodoroLayer');
-            if (layer.classList.contains('hidden-section')) {
-                layer.classList.remove('hidden-section');
-                resetPomodoro();
-            } else {
-                layer.classList.add('hidden-section');
-                if (currentState.pomoRunning) {
-                    clearInterval(currentState.pomoInterval);
-                    currentState.pomoRunning = false;
-                }
-            }
-        }
-
-        // 重置番茄钟
-        function resetPomodoro() {
-            currentState.pomoTime = currentState.pomoOriginalTime;
-            updatePomoDisplay();
-            document.getElementById('pomoStartBtn').textContent = '开始';
-        }
-
-        // 更新番茄钟提示文字
-        function updatePomoTipText() {
-            const minutes = Math.floor(currentState.pomoOriginalTime / 60);
-            const tipText = document.getElementById('pomoTipText');
-            tipText.innerHTML = `保持专注，${minutes}分钟后短暂休息<br>法律人的自律从每一刻开始`;
-        }
-
-        // 设置番茄钟自定义时间
-        function setCustomPomodoroTime() {
-            const input = document.getElementById('pomoCustomTime');
-            const minutes = parseInt(input.value.trim());
-            
-            // 输入合法性校验
-            if (isNaN(minutes) || minutes < 1 || minutes > 60) {
-                showToast('请输入1-60之间的有效数字');
-                return;
-            }
-            
-            // 停止当前运行的番茄钟
-            if (currentState.pomoRunning) {
-                clearInterval(currentState.pomoInterval);
-                currentState.pomoRunning = false;
-            }
-            
-            // 更新番茄钟时间并保存
-            currentState.pomoOriginalTime = minutes * 60;
-            currentState.pomoTime = minutes * 60;
-            updatePomoDisplay();
-            updatePomoTipText();
-            document.getElementById('pomoStartBtn').textContent = '开始';
-            saveSettings();
-            showToast(`番茄钟时间已设为${minutes}分钟`);
-            input.value = '';
-        }
-
-        function updatePomoDisplay() {
-            const mins = Math.floor(currentState.pomoTime / 60);
-            const secs = currentState.pomoTime % 60;
-            document.getElementById('pomoTime').textContent = 
-                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-            
-            const total = currentState.pomoOriginalTime;
-            const progress = (total - currentState.pomoTime) / total;
-            const offset = 289 - (289 * progress);
-            document.getElementById('pomoProgress').style.strokeDashoffset = offset;
-        }
-
-        function startPomodoro() {
-            if (currentState.pomoRunning) {
-                clearInterval(currentState.pomoInterval);
-                currentState.pomoRunning = false;
-                document.getElementById('pomoStartBtn').textContent = '继续';
-                return;
-            }
-            
-            currentState.pomoRunning = true;
-            document.getElementById('pomoStartBtn').textContent = '暂停';
-            
-            currentState.pomoInterval = setInterval(() => {
-                if (currentState.pomoTime > 0) {
-                    currentState.pomoTime--;
-                    updatePomoDisplay();
-                } else {
-                    clearInterval(currentState.pomoInterval);
-                    currentState.pomoRunning = false;
-                    document.getElementById('pomoStartBtn').textContent = '完成';
-                    showToast('专注时间结束！休息一下吧');
-                    
-                    // 播放结束提示音
-                    try {
-                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        const osc = audioContext.createOscillator();
-                        const gain = audioContext.createGain();
-                        osc.frequency.value = 523.25;
-                        gain.gain.value = 0.1;
-                        osc.connect(gain);
-                        gain.connect(audioContext.destination);
-                        osc.start();
-                        osc.stop(audioContext.currentTime + 0.5);
-                    } catch (e) {
-                        console.log('提示音播放失败:', e);
-                    }
-                }
-            }, 1000);
-        }
-
-        /* ========== 时间激励语功能 ========== */
-        function showRandomTimeMotivation() {
+        // 显示时间激励语
+        function showTimeMotivation() {
             const motivationEl = document.getElementById('timeMotivation');
-            const randomMsg = TIME_MOTIVATIONS[Math.floor(Math.random() * TIME_MOTIVATIONS.length)];
-            motivationEl.textContent = randomMsg;
+            const randomIndex = Math.floor(Math.random() * TIME_MOTIVATIONS.length);
+            motivationEl.textContent = TIME_MOTIVATIONS[randomIndex];
             motivationEl.classList.add('show');
             
             setTimeout(() => {
@@ -1198,33 +860,699 @@
             }, 5000);
         }
 
-        /* ========== 工具函数 ========== */
-        function showToast(text) {
-            const toast = document.getElementById('toast');
-            toast.textContent = text;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+        // 切换名言
+        function changePoem() {
+            currentState.poemIndex = (currentState.poemIndex + 1) % POEMS.length;
+            const poem = POEMS[currentState.poemIndex];
+            document.getElementById('poemText').textContent = poem.text;
         }
 
-        // 防止移动端双击缩放
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (e) => {
-            const now = Date.now();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
+        // 切换主题
+        function switchTheme() {
+            currentState.theme = (currentState.theme + 1) % THEMES.length;
+            document.body.setAttribute('data-theme', THEMES[currentState.theme]);
+            showToast(`已切换至${['默认主题', '日出模式', '护眼模式'][currentState.theme]}`);
+            // 同步切换背景模式
+            currentState.bgMode = (currentState.bgMode + 1) % BG_MODES.length;
+            initBackground();
+        }
 
-        // 页面卸载时暂停音乐
-        window.addEventListener('beforeunload', () => {
-            if (cheerAudio) {
-                cheerAudio.pause();
-            }
-        });
+        // 切换考试类型（客观题/主观题）
+        function switchExamType(isObjective) {
+            currentState.isObjective = isObjective;
+            document.getElementById('objBtn').classList.toggle('active', isObjective);
+            document.getElementById('subBtn').classList.toggle('active', !isObjective);
+            document.getElementById('countdownTitle').textContent = isObjective 
+                ? '距客观题考试还有' 
+                : '距主观题考试还有';
+            document.getElementById('examPhase').textContent = isObjective
+                ? '客观题备考中'
+                : '主观题备考中';
+            // 重新计算倒计时
+            updateCountdown();
+            showToast(isObjective ? '已切换为客观题倒计时' : '已切换为主观题倒计时');
+        }
 
+        // 切换天数/周数显示
+        function toggleDayWeek() {
+            currentState.showWeek = !currentState.showWeek;
+            document.getElementById('dayLabel').textContent = currentState.showWeek ? '周' : '天';
+            updateCountdown();
+            showToast(currentState.showWeek ? '已切换为周数显示' : '已切换为天数显示');
+            // 显示时间激励语
+            showTimeMotivation();
+        }
+
+        // 翻牌时钟点击效果
+        function clockClickEffect(element) {
+            element.classList.add('clicked');
+            setTimeout(() => {
+                element.classList.remove('clicked');
+            }, 500);
+            // 随机显示时间激励语
+            showTimeMotivation();
+        }
+
+        // 更新番茄钟提示文本
+        function updatePomodoroTipText() {
+            const minutes = Math.floor(currentState.pomoOriginalTime / 60);
+            const tipText = `保持专注，${minutes}分钟后短暂休息\n法律人的自律从每一刻开始`;
+            document.getElementById('pomoTipText').textContent = tipText;
+        }
+
+        // 番茄钟相关
+        function togglePomodoro() {
+            const layer = document.getElementById('pomodoroLayer');
+            layer.classList.toggle('hidden-section');
+            if (!layer.classList.contains('hidden-section')) {
+                // 重置番茄钟
+                resetPomodoro();
+                showToast('专注模式已开启，开始高效学习吧！');
+            } else {
+                stopPomodoro();
+            }
+        }
+
+        function resetPomodoro() {
+            stopPomodoro();
+            currentState.pomoTime = currentState.pomoOriginalTime;
+            updatePomodoroDisplay();
+            // 更新提示文本（核心修改）
+            updatePomodoroTipText();
+            document.getElementById('pomoStartBtn').textContent = '开始';
+        }
+
+        function setCustomPomodoroTime() {
+            const input = document.getElementById('pomoCustomTime');
+            const minutes = parseInt(input.value);
+            if (isNaN(minutes) || minutes < 1 || minutes > 60) {
+                showToast('请输入1-60之间的有效数字');
+                return;
+            }
+            currentState.pomoTime = minutes * 60;
+            currentState.pomoOriginalTime = minutes * 60;
+            updatePomodoroDisplay();
+            // 更新提示文本（核心修改）
+            updatePomodoroTipText();
+            input.value = '';
+            showToast(`已设置为${minutes}分钟专注时长`);
+        }
+
+        function updatePomodoroDisplay() {
+            const minutes = Math.floor(currentState.pomoTime / 60);
+            const seconds = currentState.pomoTime % 60;
+            const displayTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('pomoTime').textContent = displayTime;
+            
+            // 更新进度条
+            const circumference = 2 * Math.PI * 46;
+            const progress = currentState.pomoTime / currentState.pomoOriginalTime;
+            const dashoffset = circumference * (1 - progress);
+            document.getElementById('pomoProgress').style.strokeDashoffset = dashoffset;
+        }
+
+        function startPomodoro() {
+            if (currentState.pomoRunning) {
+                // 暂停
+                clearInterval(currentState.pomoInterval);
+                currentState.pomoRunning = false;
+                document.getElementById('pomoStartBtn').textContent = '继续';
+                showToast('专注计时已暂停');
+            } else {
+                // 开始/继续
+                currentState.pomoRunning = true;
+                document.getElementById('pomoStartBtn').textContent = '暂停';
+                showToast('专注计时已开始');
+                
+                currentState.pomoInterval = setInterval(() => {
+                    currentState.pomoTime--;
+                    updatePomodoroDisplay();
+                    
+                    if (currentState.pomoTime <= 0) {
+                        stopPomodoro();
+                        showToast('专注时间结束！休息一下吧');
+                        // 完成后的提示文本
+                        const minutes = Math.floor(currentState.pomoOriginalTime / 60);
+                        document.getElementById('pomoTipText').textContent = `恭喜完成${minutes}分钟专注任务！\n适当休息后继续加油`;
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopPomodoro() {
+            if (currentState.pomoInterval) {
+                clearInterval(currentState.pomoInterval);
+                currentState.pomoInterval = null;
+            }
+            currentState.pomoRunning = false;
+            document.getElementById('pomoStartBtn').textContent = '开始';
+        }
+
+        // 视频学习区切换
+        function toggleVideoArea() {
+            const layer = document.getElementById('videoAreaLayer');
+            layer.classList.toggle('hidden-section');
+            if (!layer.classList.contains('hidden-section')) {
+                showToast('视频学习区已打开');
+            }
+        }
+
+        // 题库练习区切换
+        function toggleQuestionBank() {
+            const layer = document.getElementById('questionBankLayer');
+            layer.classList.toggle('hidden-section');
+            if (!layer.classList.contains('hidden-section')) {
+                showToast('题库练习区已打开');
+            }
+        }
+
+        // 法考加油/音乐播放
+        function toggleCheer() {
+            const btn = document.getElementById('cheerBtn');
+            const icon = document.getElementById('musicIcon');
+            const msgEl = document.getElementById('encourageMsg');
+            
+            if (!currentState.isPlaying) {
+                // 播放音乐
+                if (!audio) {
+                    audio = new Audio('https://xingjiuyuzhou.github.io/Countdown/jxszf.mp3');
+                    audio.loop = true;
+                }
+                audio.play().then(() => {
+                    currentState.isPlaying = true;
+                    btn.classList.add('playing');
+                    icon.textContent = '🎶';
+                    showToast('法考加油！音乐已播放');
+                    
+                    // 随机显示鼓励语
+                    const randomMsg = ENCOURAGES[Math.floor(Math.random() * ENCOURAGES.length)];
+                    msgEl.textContent = randomMsg;
+                    msgEl.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        msgEl.style.opacity = '0';
+                    }, 3000);
+                }).catch(err => {
+                    showToast('音乐播放失败，请手动点击播放');
+                    // 仍显示鼓励语
+                    const randomMsg = ENCOURAGES[Math.floor(Math.random() * ENCOURAGES.length)];
+                    msgEl.textContent = randomMsg;
+                    msgEl.style.opacity = '1';
+                    setTimeout(() => {
+                        msgEl.style.opacity = '0';
+                    }, 3000);
+                });
+            } else {
+                // 暂停音乐
+                audio.pause();
+                currentState.isPlaying = false;
+                btn.classList.remove('playing');
+                icon.textContent = '🎵';
+                showToast('音乐已暂停');
+            }
+        }
+
+        // 更新倒计时
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const targetDate = currentState.isObjective ? EXAM_DATE_OBJ : EXAM_DATE_SUB;
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                document.getElementById('dayNum').textContent = '0';
+                document.getElementById('hourVal').textContent = '00';
+                document.getElementById('minuteVal').textContent = '00';
+                document.getElementById('secondVal').textContent = '00';
+                document.getElementById('countdownTitle').textContent = '考试已开始';
+                return;
+            }
+
+            // 计算天/周数
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const weeks = Math.floor(days / 7);
+            
+            // 根据切换状态显示天或周
+            if (currentState.showWeek) {
+                document.getElementById('dayNum').textContent = weeks;
+                // 显示剩余天数提示
+                const remainingDays = days % 7;
+                if (remainingDays > 0) {
+                    document.getElementById('dayLabel').textContent = `周(${remainingDays}天)`;
+                } else {
+                    document.getElementById('dayLabel').textContent = '周';
+                }
+            } else {
+                document.getElementById('dayNum').textContent = days;
+            }
+
+            // 计算时分秒
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // 更新翻牌时钟
+            updateFlipClock('hourVal', hours);
+            updateFlipClock('minuteVal', minutes);
+            updateFlipClock('secondVal', seconds);
+
+            // 更新里程碑进度
+            updateMilestone(days);
+        }
+
+        // 翻牌时钟更新
+        function updateFlipClock(elementId, value) {
+            const el = document.getElementById(elementId);
+            const box = el.parentElement;
+            const formatted = value.toString().padStart(2, '0');
+            
+            if (el.textContent !== formatted) {
+                box.classList.add('flipping');
+                el.textContent = formatted;
+                setTimeout(() => {
+                    box.classList.remove('flipping');
+                }, 600);
+            }
+        }
+
+        // 更新里程碑进度
+        function updateMilestone(days) {
+            // 总备考天数（从START_DATE到EXAM_DATE_OBJ）
+            const totalDays = Math.floor((EXAM_DATE_OBJ - START_DATE) / (1000 * 60 * 60 * 24));
+            // 已过天数
+            const passedDays = totalDays - days;
+            // 进度百分比
+            const progress = Math.min(100, Math.max(0, (passedDays / totalDays) * 100));
+            
+            document.getElementById('milestoneFill').style.width = `${progress}%`;
+            
+            // 更新节点状态
+            const nodes = document.querySelectorAll('.milestone-node');
+            nodes.forEach((node, index) => {
+                const nodePos = parseInt(node.style.left);
+                if (progress >= nodePos) {
+                    node.classList.add('active');
+                } else {
+                    node.classList.remove('active');
+                }
+            });
+        }
+
+        // 初始化背景Canvas
+        function initBackground() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // 不同背景模式的绘制逻辑
+            const bgMode = BG_MODES[currentState.bgMode];
+            const isSunriseTheme = currentState.theme === 1; // 日出模式
+            let animationFrame;
+
+            // 清理之前的动画
+            cancelAnimationFrame(animationFrame);
+
+            if (bgMode === 'stars') {
+                // 星空背景
+                const starCount = Math.floor(window.innerWidth / 2);
+                // 日出模式增加星星数量和大小，提高可见度
+                const stars = [];
+                const starSizeMultiplier = isSunriseTheme ? 2 : 1;
+                const starAlphaMultiplier = isSunriseTheme ? 1.5 : 1;
+                
+                // 创建星星
+                for (let i = 0; i < starCount * (isSunriseTheme ? 1.5 : 1); i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 1.5 * starSizeMultiplier,
+                        speed: Math.random() * 0.2 + 0.1,
+                        alpha: Math.random() * 0.8 + 0.2 * starAlphaMultiplier
+                    });
+                }
+
+                function drawStars() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 背景渐变
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    if (currentState.theme === 0) {
+                        gradient.addColorStop(0, '#0f172a');
+                        gradient.addColorStop(1, '#1e293b');
+                    } else if (currentState.theme === 1) {
+                        gradient.addColorStop(0, '#fff0e0');
+                        gradient.addColorStop(1, '#ffd5b0');
+                    } else {
+                        gradient.addColorStop(0, '#e8f5e9');
+                        gradient.addColorStop(1, '#c8e6c9');
+                    }
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // 绘制星星
+                    stars.forEach(star => {
+                        ctx.beginPath();
+                        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                        // 使用主题变量颜色，提高对比度
+                        const effectColor = getComputedStyle(document.documentElement).getPropertyValue('--effect-color');
+                        ctx.fillStyle = effectColor.replace('0.8', star.alpha.toFixed(2));
+                        ctx.fill();
+                        
+                        // 星星移动
+                        star.y += star.speed;
+                        if (star.y > canvas.height) {
+                            star.y = 0;
+                            star.x = Math.random() * canvas.width;
+                        }
+                    });
+
+                    animationFrame = requestAnimationFrame(drawStars);
+                }
+                drawStars();
+
+            } else if (bgMode === 'rain') {
+                // 雨滴背景
+                const dropCount = Math.floor(window.innerWidth / 5);
+                // 日出模式增加雨滴数量和长度，提高可见度
+                const drops = [];
+                const dropSizeMultiplier = isSunriseTheme ? 1.8 : 1;
+                
+                for (let i = 0; i < dropCount * (isSunriseTheme ? 2 : 1); i++) {
+                    drops.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        length: Math.random() * 15 + 5 * dropSizeMultiplier,
+                        speed: Math.random() * 5 + 2,
+                        opacity: Math.random() * 0.5 + 0.2 * (isSunriseTheme ? 1.5 : 1)
+                    });
+                }
+
+                function drawRain() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 背景渐变
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    if (currentState.theme === 0) {
+                        gradient.addColorStop(0, '#0f172a');
+                        gradient.addColorStop(1, '#1e293b');
+                    } else if (currentState.theme === 1) {
+                        gradient.addColorStop(0, '#fff0e0');
+                        gradient.addColorStop(1, '#ffd5b0');
+                    } else {
+                        gradient.addColorStop(0, '#e8f5e9');
+                        gradient.addColorStop(1, '#c8e6c9');
+                    }
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // 绘制雨滴
+                    drops.forEach(drop => {
+                        ctx.beginPath();
+                        ctx.moveTo(drop.x, drop.y);
+                        ctx.lineTo(drop.x, drop.y + drop.length);
+                        // 使用主题变量颜色，提高对比度
+                        const effectColor = getComputedStyle(document.documentElement).getPropertyValue('--effect-color');
+                        ctx.strokeStyle = effectColor.replace('0.8', drop.opacity.toFixed(2));
+                        ctx.lineWidth = isSunriseTheme ? 2 : 1; // 日出模式加粗雨滴
+                        ctx.stroke();
+                        
+                        // 雨滴下落
+                        drop.y += drop.speed;
+                        if (drop.y > canvas.height) {
+                            drop.y = -drop.length;
+                            drop.x = Math.random() * canvas.width;
+                        }
+                    });
+
+                    animationFrame = requestAnimationFrame(drawRain);
+                }
+                drawRain();
+
+            } else if (bgMode === 'ink') {
+                // 水墨扩散效果
+                const circleCount = 5;
+                // 日出模式增加圆圈大小和数量，提高可见度
+                const circles = [];
+                
+                for (let i = 0; i < (isSunriseTheme ? 8 : circleCount); i++) {
+                    circles.push({
+                        x: canvas.width / 2,
+                        y: canvas.height / 2,
+                        radius: Math.random() * 100 + 50 * (isSunriseTheme ? 1.5 : 1),
+                        speed: Math.random() * 0.5 + 0.1,
+                        alpha: Math.random() * 0.2 + 0.1 * (isSunriseTheme ? 2 : 1),
+                        color: currentState.theme === 0 
+                            ? 'rgba(76, 117, 230, {alpha})'
+                            : currentState.theme === 1
+                                ? 'rgba(255, 140, 66, {alpha})'
+                                : 'rgba(93, 140, 127, {alpha})'
+                    });
+                }
+
+                function drawInk() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // 背景色
+                    if (currentState.theme === 0) {
+                        ctx.fillStyle = '#0f172a';
+                    } else if (currentState.theme === 1) {
+                        ctx.fillStyle = '#fff0e0';
+                    } else {
+                        ctx.fillStyle = '#e8f5e9';
+                    }
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // 绘制扩散的圆圈
+                    circles.forEach(circle => {
+                        ctx.beginPath();
+                        ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+                        const color = circle.color.replace('{alpha}', circle.alpha);
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = isSunriseTheme ? 3 : 2; // 日出模式加粗圆圈
+                        ctx.stroke();
+                        
+                        // 扩散动画
+                        circle.radius += circle.speed;
+                        circle.alpha -= (isSunriseTheme ? 0.0015 : 0.001);
+                        
+                        // 重置
+                        if (circle.alpha <= 0) {
+                            circle.radius = Math.random() * 50 + 20 * (isSunriseTheme ? 1.5 : 1);
+                            circle.alpha = Math.random() * 0.2 + 0.1 * (isSunriseTheme ? 2 : 1);
+                            circle.x = Math.random() * canvas.width;
+                            circle.y = Math.random() * canvas.height;
+                        }
+                    });
+
+                    animationFrame = requestAnimationFrame(drawInk);
+                }
+                drawInk();
+            }
+        }
+
+        
+        /* ========== 视频学习区数据与筛选功能 ========== */
+        // 机构图标配置
+        const institutionConfig = {
+            '众合教育': { 
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>',
+                color: 'from-blue-500 to-blue-600',
+                bgColor: 'bg-blue-500'
+            },
+            '厚大法考': { 
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>',
+                color: 'from-amber-500 to-orange-600',
+                bgColor: 'bg-amber-500'
+            },
+            '听过法考': { 
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>',
+                color: 'from-emerald-500 to-teal-600',
+                bgColor: 'bg-emerald-500'
+            },
+            '瑞达法考': { 
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>',
+                color: 'from-purple-500 to-indigo-600',
+                bgColor: 'bg-purple-500'
+            },
+            '觉晓法考': { 
+                icon: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>',
+                color: 'from-rose-500 to-pink-600',
+                bgColor: 'bg-rose-500'
+            }
+        };
+
+        const courseData = [{"institution": "众合教育", "subject": "三国法", "teacher": "杨帆", "duration": "28:01:45", "url": "https://www.bilibili.com/video/BV1t6yzBeEVF"}, {"institution": "众合教育", "subject": "商经知", "teacher": "郄鹏恩", "duration": "28:42:51", "url": "https://www.bilibili.com/video/BV1Q8iMBhEjH"}, {"institution": "众合教育", "subject": "民诉法", "teacher": "戴鹏", "duration": "34:36:35", "url": "https://www.bilibili.com/video/BV1zUBDBKEsH"}, {"institution": "众合教育", "subject": "刑诉法", "teacher": "左宁", "duration": "48:26:06", "url": "https://www.bilibili.com/video/BV1nLBVBPEh6"}, {"institution": "众合教育", "subject": "行政法", "teacher": "李佳", "duration": "44:55:54", "url": "https://www.bilibili.com/video/BV1qyB5BAEXX"}, {"institution": "众合教育", "subject": "刑法", "teacher": "柏浪涛", "duration": "56:41:23", "url": "https://www.bilibili.com/video/BV1EX1aBTER8"}, {"institution": "众合教育", "subject": "民法", "teacher": "孟献贵", "duration": "56:16:38", "url": "https://www.bilibili.com/video/BV1Z7yzBJERB"}, {"institution": "觉晓法考", "subject": "三国法", "teacher": "赵明阳", "duration": "20:17:30", "url": "https://www.bilibili.com/video/BV1rEquBQEs5"}, {"institution": "觉晓法考", "subject": "民法", "teacher": "李劲松", "duration": "63:10:48", "url": "https://www.bilibili.com/video/BV1vavbBoE5W"}, {"institution": "觉晓法考", "subject": "刑法", "teacher": "徐光华", "duration": "75:44:49", "url": "https://www.bilibili.com/video/BV1cVsmzjEB4"}, {"institution": "觉晓法考", "subject": "民法", "teacher": "夏昊晗", "duration": "48:48:17", "url": "https://www.bilibili.com/video/BV1hpycBaEph"}, {"institution": "觉晓法考", "subject": "民诉法", "teacher": "韩心怡", "duration": "45:07:32", "url": "https://www.bilibili.com/video/BV1Ja2zBoEDj"}, {"institution": "觉晓法考", "subject": "刑诉法", "teacher": "肖沛权", "duration": "38:17:55", "url": "https://www.bilibili.com/video/BV1d1ipB2E9j"}, {"institution": "觉晓法考", "subject": "商经知", "teacher": "刘安琪", "duration": "43:16:16", "url": "https://www.bilibili.com/video/BV1i4iWBUEU5"}, {"institution": "觉晓法考", "subject": "行政法", "teacher": "兰燕卓", "duration": "29:43:16", "url": "https://www.bilibili.com/video/BV1ViquBgEvm"}, {"institution": "觉晓法考", "subject": "理论法", "teacher": "李宏勃", "duration": "32:07:29", "url": "https://www.bilibili.com/video/BV1xCkLBtEYM"}, {"institution": "瑞达法考", "subject": "刑法", "teacher": "蔡雅奇", "duration": "53:21:52", "url": "https://www.bilibili.com/video/BV1jeUbBYELu"}, {"institution": "瑞达法考", "subject": "理论法", "teacher": "宋光明", "duration": "41:50:58", "url": "https://www.bilibili.com/video/BV1Vqq3B7EV9"}, {"institution": "瑞达法考", "subject": "商经知", "teacher": "李晗", "duration": "49:00:56", "url": "https://www.bilibili.com/video/BV1YyvWBVELi"}, {"institution": "瑞达法考", "subject": "刑诉法", "teacher": "杨雄", "duration": "54:16:42", "url": "https://www.bilibili.com/video/BV1nMU8BgELD"}, {"institution": "瑞达法考", "subject": "三国法", "teacher": "王斌", "duration": "34:23:49", "url": "https://www.bilibili.com/video/BV1hAvYBAEZq"}, {"institution": "瑞达法考", "subject": "民法", "teacher": "钟秀勇", "duration": "51:18:57", "url": "https://www.bilibili.com/video/BV12Vz5B7EE1"}, {"institution": "听过法考", "subject": "行政法", "teacher": "李年清", "duration": "2:48:15", "url": "https://www.bilibili.com/video/BV18BFKzDELo"}, {"institution": "听过法考", "subject": "刑诉法", "teacher": "温云云", "duration": "38:49:26", "url": "https://www.bilibili.com/video/BV1gH2VBzEEA"}, {"institution": "听过法考", "subject": "民诉法", "teacher": "蔡辉", "duration": "11:12:39", "url": "https://www.bilibili.com/video/BV1g26uB5EKu"}, {"institution": "听过法考", "subject": "民法", "teacher": "韩祥波", "duration": "48:52:28", "url": "https://www.bilibili.com/video/BV1WPUCBJEyr"}, {"institution": "听过法考", "subject": "民法", "teacher": "余泉君", "duration": "90:53:12", "url": "https://www.bilibili.com/video/BV1SsCSBhEuM"}, {"institution": "听过法考", "subject": "刑法", "teacher": "张宇琛", "duration": "45:15:47", "url": "https://www.bilibili.com/video/BV1qa19BFESt"}, {"institution": "厚大法考", "subject": "刑法", "teacher": "刘凤科", "duration": "0:0:0", "url": "https://www.bilibili.com/video/BV1DTkvBXEMw"}, {"institution": "厚大法考", "subject": "商经法", "teacher": "鄢梦萱", "duration": "13:26:07", "url": "https://www.bilibili.com/video/BV1hX1aBTEr9"}, {"institution": "厚大法考", "subject": "民法", "teacher": "张翔", "duration": "52:57:14", "url": "https://www.bilibili.com/video/BV11zs1zSEPS"}, {"institution": "厚大法考", "subject": "刑法", "teacher": "罗翔", "duration": "42:34:36", "url": "https://www.bilibili.com/video/BV15kyBB5Eg8"}, {"institution": "厚大法考", "subject": "刑诉法", "teacher": "向高甲", "duration": "34:42:53", "url": "https://www.bilibili.com/video/BV1vmkTBQELC"}, {"institution": "厚大法考", "subject": "民诉法", "teacher": "刘鹏飞", "duration": "25:23:04", "url": "https://www.bilibili.com/video/BV16MiQBvEuE"}, {"institution": "厚大法考", "subject": "三国法", "teacher": "殷敏", "duration": "26:39:31", "url": "https://www.bilibili.com/video/BV1j7vsBDEWu"}, {"institution": "厚大法考", "subject": "行政法", "teacher": "魏建新", "duration": "27:18:19", "url": "https://www.bilibili.com/video/BV1j7vsBDEWu"}];
+
+        let currentFilters = {
+            institution: 'all',
+            subject: 'all'
+        };
+
+        // 渲染课程卡片
+        function renderCourses(courses) {
+            const grid = document.getElementById('courseGrid');
+            const stats = document.getElementById('courseStats');
+
+            // 更新统计
+            stats.textContent = `共 ${courses.length} 门`;;
+
+            // 清空现有内容
+            grid.innerHTML = '';
+
+            if (courses.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-6 text-[var(--text-muted)]">
+                        <svg class="w-10 h-10 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-xs">无匹配课程</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 生成卡片
+            courses.forEach((course, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--accent-glow)] hover:-translate-y-1 cursor-pointer group hover:border-[var(--primary-color)] hover:border-opacity-50 course-card-enter';
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <!-- 机构图标 -->
+                        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br ${(institutionConfig[course.institution] ? institutionConfig[course.institution].color : institutionConfig['众合教育'].color)} text-white flex items-center justify-center shadow-lg">
+                            ${(institutionConfig[course.institution] ? institutionConfig[course.institution].icon : institutionConfig['众合教育'].icon)}
+                        </div>
+
+                        <!-- 内容区 -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-medium text-[var(--text-main)]">${course.institution}</span>
+                                <span class="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-50"></span>
+                                <span class="text-xs text-[var(--primary-color)]">${course.subject}</span>
+                            </div>
+                            <h4 class="text-base font-bold text-[var(--text-main)] mb-1 group-hover:text-[var(--primary-color)] transition-colors truncate">
+                                ${course.teacher}老师
+                            </h4>
+                            <div class="flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span>${course.duration}</span>
+                            </div>
+                        </div>
+
+                        <!-- 播放按钮 -->
+                        <a href="${course.url}" target="_blank" class="flex-shrink-0 w-9 h-9 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--primary-color)] flex items-center justify-center hover:bg-[var(--primary-color)] hover:text-white transition-all shadow-md" onclick="event.stopPropagation();">
+                            <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </a>
+                    </div>
+                `;
+                card.onclick = () => window.open(course.url, '_blank');
+                grid.appendChild(card);
+            });
+        }
+
+        // 按机构筛选
+        function filterByInstitution(institution) {
+            currentFilters.institution = institution;
+
+            // 更新按钮状态
+            document.querySelectorAll('#institutionFilters .filter-btn').forEach(btn => {
+                if (btn.dataset.filter === institution) {
+                    btn.classList.add('active', 'bg-[var(--primary-color)]', 'text-white');
+                    btn.classList.remove('text-[var(--text-muted)]');
+                } else {
+                    btn.classList.remove('active', 'bg-[var(--primary-color)]', 'text-white');
+                    btn.classList.add('text-[var(--text-muted)]');
+                }
+            });
+
+            applyFilters();
+        }
+
+        // 按科目筛选
+        function filterBySubject(subject) {
+            currentFilters.subject = subject;
+
+            // 更新按钮状态
+            document.querySelectorAll('#subjectFilters .filter-btn-sub').forEach(btn => {
+                if (btn.dataset.filter === subject) {
+                    btn.classList.add('active', 'bg-[var(--primary-color)]', 'text-white');
+                    btn.classList.remove('text-[var(--text-muted)]');
+                } else {
+                    btn.classList.remove('active', 'bg-[var(--primary-color)]', 'text-white');
+                    btn.classList.add('text-[var(--text-muted)]');
+                }
+            });
+
+            applyFilters();
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            let filtered = courseData;
+
+            if (currentFilters.institution !== 'all') {
+                filtered = filtered.filter(c => c.institution === currentFilters.institution);
+            }
+
+            if (currentFilters.subject !== 'all') {
+                filtered = filtered.filter(c => c.subject === currentFilters.subject);
+            }
+
+            renderCourses(filtered);
+        }
+
+        // 重置筛选
+        function resetVideoFilters() {
+            currentFilters = { institution: 'all', subject: 'all' };
+            filterByInstitution('all');
+            filterBySubject('all');
+            showToast('筛选已重置');
+        }
+
+        // 初始化视频学习区
+        function initVideoArea() {
+            renderCourses(courseData);
+        }
+
+/* ========== 初始化 ========== */
+        function init() {
+            // 初始化背景
+            initBackground();
+            
+            // 初始更新倒计时
+            updateCountdown();
+            // 每秒更新倒计时
+            setInterval(updateCountdown, 1000);
+            
+            // 点击名言切换
+            document.getElementById('poemContainer').addEventListener('click', changePoem);
+            
+            // 初始切换一次名言增加随机性
+            setTimeout(changePoem, 1000);
+            
+            // 初始化番茄钟提示文本
+            updatePomodoroTipText();
+            
+            // 显示欢迎提示
+            setTimeout(() => {
+                initVideoArea();
+            showToast('2026法考备考助手已就绪！');
+            }, 1500);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
