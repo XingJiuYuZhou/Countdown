@@ -468,6 +468,91 @@
             transform: scale(1.1) rotate(5deg);
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
+
+        /* 视频播放器分P列表样式 */
+        #pagesList::-webkit-scrollbar {
+            width: 4px;
+            display: block;
+        }
+        #pagesList::-webkit-scrollbar-track {
+            background: rgba(128,128,128,0.1);
+            border-radius: 2px;
+        }
+        #pagesList::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* 视频容器样式 - 确保正确显示 */
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 比例 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #000;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 视频学习区视觉增强 */
+        .video-section-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(76,117,230,0.24), rgba(124,58,237,0.28));
+            box-shadow: 0 8px 24px rgba(15,23,42,0.55);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .video-section-title-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.8);
+            color: var(--primary-color);
+        }
+
+        .video-section-title-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--text-main);
+        }
+
+        .video-section-subtitle {
+            margin-top: 0.6rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .section-label-tag {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            opacity: 0.85;
+        }
     </style>
 <base target="_blank">
 </head>
@@ -643,23 +728,86 @@
             </p>
         </div>
 
-        <!-- 视频学习覆盖层 -->
-        <div id="videoAreaLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center p-8 overflow-y-auto"><div class="flex items-center justify-center gap-2 mb-4">
-                <svg class="w-6 h-6 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <h3 class="text-2xl font-bold text-[var(--text-main)]">法考视频学习</h3>
+        <!-- 视频学习覆盖层（已修改：集成B站播放器 - 修复版） -->
+        <div id="videoAreaLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center p-8 overflow-y-auto">
+            <div class="flex flex-col items-center mb-6">
+                <div class="video-section-title">
+                    <span class="video-section-title-icon">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-4.197-2.632A1 1 0 009 9.37v5.26a1 1 0 001.555.832l4.197-2.632a1 1 0 000-1.664z"></path>
+                        </svg>
+                    </span>
+                    <span class="video-section-title-text">法考视频学习</span>
+                </div>
+                <p class="video-section-subtitle">精选各大机构优质课程，按科目与机构一键直达</p>
+            </div>
+
+            <!-- 视频播放器区域 -->
+            <div id="videoPlayerSection" class="w-full max-w-md mb-6 hidden">
+                <!-- 视频标题和返回按钮 -->
+                <div class="flex items-center justify-between mb-3">
+                    <h4 id="currentVideoTitle" class="text-lg font-bold text-[var(--text-main)] truncate flex-1 mr-2"></h4>
+                    <button onclick="closeVideoPlayer()" class="px-3 py-1 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-xs text-[var(--text-muted)] hover:bg-[var(--primary-color)] hover:text-white transition">
+                        返回列表
+                    </button>
+                </div>
+                
+                <!-- 视频播放器容器 - 使用16:9比例自适应 -->
+                <div class="video-container">
+                    <iframe id="bilibiliPlayer" 
+                        src="" 
+                        frameborder="no" 
+                        scrolling="no" 
+                        allowfullscreen="true">
+                    </iframe>
+                </div>
+
+                <!-- 分P上一/下一控制条 -->
+                <div id="pageNavControls" class="mt-3 flex items-center justify-between text-xs text-[var(--text-muted)] hidden">
+                    <button onclick="prevVideoPage()" class="px-3 py-1 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] hover:bg-[var(--primary-color)] hover:text-white transition">
+                        上一P
+                    </button>
+                    <span id="pageStatusText" class="px-2"></span>
+                    <button onclick="nextVideoPage()" class="px-3 py-1 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] hover:bg-[var(--primary-color)] hover:text-white transition">
+                        下一P
+                    </button>
+                </div>
+
+                <!-- 分P选择器 -->
+                <div id="videoPagesSection" class="mt-4 hidden">
+                    <div class="text-sm font-bold text-[var(--text-main)] mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        课程目录 (<span id="pageCount">0</span>P)
+                    </div>
+                    <div id="pagesList" class="max-h-48 overflow-y-auto space-y-2 pr-1">
+                        <!-- 分P列表由JS动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 视频信息 -->
+                <div id="videoInfoSection" class="mt-4 p-3 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+                    <div class="flex items-center gap-3">
+                        <img id="videoOwnerAvatar" src="" alt="" class="w-10 h-10 rounded-full border-2 border-[var(--primary-color)] hidden">
+                        <div class="flex-1">
+                            <div id="videoOwnerName" class="text-sm font-medium text-[var(--text-main)]"></div>
+                            <div class="text-xs text-[var(--text-muted)] mt-0.5">
+                                <span id="videoViewCount"></span> · <span id="videoDuration"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 筛选栏 - 紧凑型设计 -->
-            <div class="w-full max-w-md mb-4 bg-[var(--glass-bg)] backdrop-blur-md p-3 rounded-xl border border-[var(--glass-border)] shadow-lg">
+            <div id="filterSection" class="w-full max-w-md mb-4 bg-[var(--glass-bg)] backdrop-blur-md p-3 rounded-2xl border border-[var(--glass-border)] shadow-lg">
                 <!-- 头部：标题和重置 -->
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-[var(--primary-color)] bg-opacity-20 flex items-center justify-center">
+                        <div class="w-8 h-8 rounded-xl bg-[var(--primary-color)] bg-opacity-15 flex items-center justify-center shadow-sm">
                             <svg class="w-4 h-4 text-[var(--primary-color)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M6 10h12M9 14h6m-4 4h2"></path>
                             </svg>
                         </div>
                         <span class="text-sm font-bold text-[var(--text-main)]">筛选课程</span>
@@ -713,14 +861,19 @@
                 </div>
             </div>
 
-            <!-- 课程卡片网格 -->
+            <!-- 课程列表标签 + 课程卡片网格 -->
+            <div class="w-full max-w-md flex items-center justify-between mb-2 mt-1">
+                <span class="section-label">课程列表</span>
+                <span class="section-label-tag">点击卡片或右侧播放按钮开始学习</span>
+            </div>
             <div class="w-full max-w-md grid grid-cols-1 gap-4 pb-8" id="courseGrid">
                 <!-- 课程卡片由JS动态生成 -->
             </div>
 
             <button onclick="toggleVideoArea()" class="mt-4 px-8 py-3 rounded-full bg-gradient-to-r from-[var(--primary-color)] to-purple-600 text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
                 关闭
-            </button></div>
+            </button>
+        </div>
 
         <!-- 题库练习覆盖层 -->
         <div id="questionBankLayer" class="hidden-section absolute inset-0 z-20 glass-card flex flex-col items-center p-8 overflow-y-auto">
@@ -1013,6 +1166,11 @@
             layer.classList.toggle('hidden-section');
             if (!layer.classList.contains('hidden-section')) {
                 showToast('视频学习区已打开');
+            } else {
+                // 如果正在播放视频，关闭时停止播放
+                if (currentBvid) {
+                    closeVideoPlayer();
+                }
             }
         }
 
@@ -1393,13 +1551,355 @@
             subject: 'all'
         };
 
-        // 渲染课程卡片
+        /* ========== B站视频播放器功能（已修复） ========== */
+        let currentVideoInfo = null;
+        let currentBvid = null;
+        // 当前分P状态
+        let currentPage = 1;
+        let currentPagesCount = 1;
+
+        // 从URL中提取BV号
+        function extractBvid(url) {
+            const match = url.match(/BV[a-zA-Z0-9]+/);
+            return match ? match[0] : null;
+        }
+
+        // 分P记忆：本地存储key
+        function getPageStorageKey(bvid) {
+            return `video_current_p_${bvid}`;
+        }
+
+        function saveCurrentPage(bvid, pageNum) {
+            try {
+                localStorage.setItem(getPageStorageKey(bvid), String(pageNum));
+            } catch (e) {
+                console.warn('保存分P进度失败', e);
+            }
+        }
+
+        function loadSavedPage(bvid, maxPage) {
+            try {
+                const raw = localStorage.getItem(getPageStorageKey(bvid));
+                const num = parseInt(raw, 10);
+                if (!isNaN(num) && num >= 1 && num <= maxPage) {
+                    return num;
+                }
+            } catch (e) {
+                console.warn('读取分P进度失败', e);
+            }
+            return 1;
+        }
+
+        // 获取视频详细信息（包含分P信息）
+        async function fetchVideoInfo(bvid) {
+            try {
+                showToast('正在加载视频信息...');
+                // 使用 v1 接口，兼容多种返回结构
+                const response = await fetch(`https://uapis.cn/api/v1/social/bilibili/videoinfo?bvid=${bvid}`);
+                const data = await response.json();
+
+                // 情况1：{ code: 0/200, data: {...} }
+                if (data && (data.code === 0 || data.code === 200) && data.data) {
+                    return data.data;
+                }
+
+                // 情况2：直接返回视频对象（示例：uapis 文档里的格式）
+                if (data && data.bvid && Array.isArray(data.pages)) {
+                    return data;
+                }
+
+                // 情况3：嵌套 data 且 data.pages 存在
+                if (data && data.data && data.data.bvid && Array.isArray(data.data.pages)) {
+                    return data.data;
+                }
+
+                throw new Error(data && data.message ? data.message : '获取视频信息失败');
+            } catch (error) {
+                console.error('获取视频信息失败:', error);
+                showToast('获取视频信息失败，使用默认播放');
+                return null;
+            }
+        }
+
+        // 格式化数字
+        function formatNumber(num) {
+            if (!num) return '0';
+            if (num >= 10000) {
+                return (num / 10000).toFixed(1) + '万';
+            }
+            return num.toString();
+        }
+
+        // 播放视频
+        async function playVideo(course) {
+            const bvid = extractBvid(course.url);
+            if (!bvid) {
+                showToast('无法识别的视频链接');
+                return;
+            }
+
+            currentBvid = bvid;
+            
+            // 获取视频详细信息
+            const videoInfo = await fetchVideoInfo(bvid);
+            currentVideoInfo = videoInfo;
+
+            // 默认从第1P开始，如果本地有记忆则稍后覆盖
+            let initialPage = 1;
+            
+            // 隐藏筛选区和课程列表，显示播放器
+            document.getElementById('filterSection').classList.add('hidden');
+            document.getElementById('courseGrid').classList.add('hidden');
+            document.getElementById('videoPlayerSection').classList.remove('hidden');
+            
+            // 设置视频标题
+            document.getElementById('currentVideoTitle').textContent = videoInfo ? videoInfo.title : `${course.institution} - ${course.teacher} ${course.subject}`;
+            
+            // 设置视频信息
+            if (videoInfo) {
+                // 设置UP主信息
+                if (videoInfo.owner) {
+                    const avatarImg = document.getElementById('videoOwnerAvatar');
+                    avatarImg.src = videoInfo.owner.face;
+                    avatarImg.classList.remove('hidden');
+                    avatarImg.onerror = function() {
+                        this.classList.add('hidden');
+                    };
+                    document.getElementById('videoOwnerName').textContent = videoInfo.owner.name;
+                }
+                
+                // 设置统计数据
+                if (videoInfo.stat) {
+                    document.getElementById('videoViewCount').textContent = `${formatNumber(videoInfo.stat.view)}次观看`;
+                }
+                if (videoInfo.duration) {
+                    const minutes = Math.floor(videoInfo.duration / 60);
+                    const seconds = videoInfo.duration % 60;
+                    document.getElementById('videoDuration').textContent = `总时长 ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+                
+                // 渲染分P列表 & 记忆当前P
+                if (Array.isArray(videoInfo.pages) && videoInfo.pages.length > 0) {
+                    const pagesCount = videoInfo.pages.length;
+                    const savedPage = loadSavedPage(bvid, pagesCount);
+                    initialPage = savedPage;
+                    renderVideoPages(videoInfo.pages, bvid, initialPage);
+                } else {
+                    document.getElementById('videoPagesSection').classList.add('hidden');
+                    const nav = document.getElementById('pageNavControls');
+                    if (nav) nav.classList.add('hidden');
+                    currentPagesCount = 1;
+                    currentPage = 1;
+                }
+            } else {
+                // 使用课程数据作为后备
+                document.getElementById('videoOwnerName').textContent = course.teacher;
+                document.getElementById('videoViewCount').textContent = '未知播放量';
+                document.getElementById('videoDuration').textContent = `时长 ${course.duration}`;
+                document.getElementById('videoPagesSection').classList.add('hidden');
+                const nav = document.getElementById('pageNavControls');
+                if (nav) nav.classList.add('hidden');
+                currentPagesCount = 1;
+                currentPage = 1;
+            }
+            
+            // 加载播放器（根据记忆的分P）
+            loadPlayer(bvid, initialPage);
+            
+            showToast('已开始播放');
+        }
+
+        // 渲染分P列表，支持指定当前P
+        function renderVideoPages(pages, bvid, activePage = 1) {
+            const pagesList = document.getElementById('pagesList');
+            const pagesSection = document.getElementById('videoPagesSection');
+            const nav = document.getElementById('pageNavControls');
+            
+            if (!pages || pages.length <= 1) {
+                pagesSection.classList.add('hidden');
+                if (nav) nav.classList.add('hidden');
+                currentPagesCount = pages ? pages.length : 1;
+                currentPage = 1;
+                return;
+            }
+
+            const safeActivePage = Math.min(Math.max(activePage, 1), pages.length);
+            currentPagesCount = pages.length;
+            currentPage = safeActivePage;
+            
+            pagesSection.classList.remove('hidden');
+            if (nav) nav.classList.remove('hidden');
+            document.getElementById('pageCount').textContent = pages.length;
+
+            updatePageStatusText();
+            
+            pagesList.innerHTML = pages.map((page, index) => {
+                const pageNum = index + 1;
+                const isActive = pageNum === safeActivePage
+                    ? 'bg-[var(--primary-color)] text-white border-[var(--primary-color)]'
+                    : 'bg-[var(--glass-bg)] text-[var(--text-muted)] border-[var(--glass-border)] hover:bg-[var(--glass-bg)]/80';
+                const duration = page.duration ? ` (${formatDuration(page.duration)})` : '';
+                
+                return `
+                    <button onclick="switchVideoPage('${bvid}', ${pageNum})" 
+                            id="pageBtn-${pageNum}"
+                            class="w-full text-left px-3 py-2 rounded-lg border ${isActive} transition-all text-sm flex items-center gap-2 group">
+                        <span class="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--glass-bg)] bg-opacity-50 flex items-center justify-center text-xs font-bold ${pageNum === safeActivePage ? 'bg-white text-[var(--primary-color)]' : 'group-hover:bg-[var(--primary-color)] group-hover:text-white'}">
+                            ${pageNum}
+                        </span>
+                        <span class="truncate flex-1">${page.part}${duration}</span>
+                        ${pageNum === safeActivePage ? '<span class="text-xs opacity-75">播放中</span>' : ''}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // 格式化时长
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            if (mins >= 60) {
+                const hours = Math.floor(mins / 60);
+                const remainingMins = mins % 60;
+                return `${hours}:${remainingMins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 更新分P状态文本
+        function updatePageStatusText() {
+            const el = document.getElementById('pageStatusText');
+            if (!el) return;
+
+            if (!currentVideoInfo || !currentVideoInfo.pages || currentVideoInfo.pages.length <= 1) {
+                el.textContent = '';
+                return;
+            }
+            el.textContent = `第 ${currentPage} / ${currentPagesCount} P`;
+        }
+
+        // 切换视频分P
+        function switchVideoPage(bvid, pageNum) {
+            if (!currentVideoInfo || !currentVideoInfo.pages || currentVideoInfo.pages.length <= 1) {
+                showToast('当前视频没有分P可切换');
+                return;
+            }
+            const pagesTotal = currentVideoInfo.pages.length;
+            if (pageNum < 1 || pageNum > pagesTotal) return;
+
+            // 更新按钮状态
+            document.querySelectorAll('#pagesList button').forEach((btn, idx) => {
+                const btnPageNum = idx + 1;
+                const spanBadge = btn.querySelector('span:first-child');
+                const spanStatus = btn.querySelector('span:last-child');
+                
+                if (btnPageNum === pageNum) {
+                    btn.className = 'w-full text-left px-3 py-2 rounded-lg border bg-[var(--primary-color)] text-white border-[var(--primary-color)] transition-all text-sm flex items-center gap-2 group';
+                    spanBadge.className = 'flex-shrink-0 w-5 h-5 rounded-full bg-white flex items-center justify-center text-xs font-bold text-[var(--primary-color)]';
+                    if (!spanStatus || !spanStatus.textContent.includes('播放中')) {
+                        const newSpan = document.createElement('span');
+                        newSpan.className = 'text-xs opacity-75';
+                        newSpan.textContent = '播放中';
+                        btn.appendChild(newSpan);
+                    }
+                } else {
+                    btn.className = 'w-full text-left px-3 py-2 rounded-lg border bg-[var(--glass-bg)] text-[var(--text-muted)] border-[var(--glass-border)] hover:bg-[var(--glass-bg)]/80 transition-all text-sm flex items-center gap-2 group';
+                    spanBadge.className = 'flex-shrink-0 w-5 h-5 rounded-full bg-[var(--glass-bg)] bg-opacity-50 flex items-center justify-center text-xs font-bold group-hover:bg-[var(--primary-color)] group-hover:text-white';
+                    if (spanStatus && spanStatus.textContent === '播放中') {
+                        spanStatus.remove();
+                    }
+                }
+            });
+
+            currentPage = pageNum;
+            currentPagesCount = pagesTotal;
+            updatePageStatusText();
+            saveCurrentPage(bvid, pageNum);
+            
+            // 重新加载播放器
+            loadPlayer(bvid, pageNum);
+            showToast(`已切换到第${pageNum}P`);
+        }
+
+        // 上一/下一P
+        function prevVideoPage() {
+            if (!currentBvid) {
+                showToast('请先选择课程并开始播放');
+                return;
+            }
+            if (!currentVideoInfo || !currentVideoInfo.pages || currentVideoInfo.pages.length <= 1) {
+                showToast('当前视频没有分P可切换');
+                return;
+            }
+            if (currentPage <= 1) {
+                showToast('已经是第1P');
+                return;
+            }
+            switchVideoPage(currentBvid, currentPage - 1);
+        }
+
+        function nextVideoPage() {
+            if (!currentBvid) {
+                showToast('请先选择课程并开始播放');
+                return;
+            }
+            if (!currentVideoInfo || !currentVideoInfo.pages || currentVideoInfo.pages.length <= 1) {
+                showToast('当前视频没有分P可切换');
+                return;
+            }
+            const pagesTotal = currentVideoInfo.pages.length;
+            if (currentPage >= pagesTotal) {
+                showToast('已经是最后一P');
+                return;
+            }
+            switchVideoPage(currentBvid, currentPage + 1);
+        }
+
+        // 加载B站播放器（根据终端类型优化）
+        function loadPlayer(bvid, page) {
+            const player = document.getElementById('bilibiliPlayer');
+            const ua = navigator.userAgent || '';
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+
+            let src;
+            if (isMobile) {
+                // 移动端 H5 播放页
+                src = `https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=${bvid}&page=${page}&autoplay=1&danmaku=0`;
+            } else {
+                // PC 端官方播放器，默认高清、关弹幕
+                src = `https://player.bilibili.com/player.html?bvid=${bvid}&page=${page}&high_quality=1&danmaku=0&autoplay=1`;
+            }
+            player.src = src;
+        }
+
+        // 关闭视频播放器，返回列表
+        function closeVideoPlayer() {
+            // 停止播放（清空src）
+            document.getElementById('bilibiliPlayer').src = '';
+            
+            // 显示筛选区和课程列表，隐藏播放器
+            document.getElementById('filterSection').classList.remove('hidden');
+            document.getElementById('courseGrid').classList.remove('hidden');
+            document.getElementById('videoPlayerSection').classList.add('hidden');
+            document.getElementById('videoPagesSection').classList.add('hidden');
+            const nav = document.getElementById('pageNavControls');
+            if (nav) nav.classList.add('hidden');
+            const statusEl = document.getElementById('pageStatusText');
+            if (statusEl) statusEl.textContent = '';
+            
+            currentVideoInfo = null;
+            currentBvid = null;
+            currentPage = 1;
+            currentPagesCount = 1;
+        }
+
+        // 渲染课程卡片（已修改：点击播放视频）
         function renderCourses(courses) {
             const grid = document.getElementById('courseGrid');
             const stats = document.getElementById('courseStats');
 
             // 更新统计
-            stats.textContent = `共 ${courses.length} 门`;;
+            stats.textContent = `共 ${courses.length} 门`;
 
             // 清空现有内容
             grid.innerHTML = '';
@@ -1420,7 +1920,6 @@
             courses.forEach((course, index) => {
                 const card = document.createElement('div');
                 card.className = 'bg-[var(--card-bg)] border border-[var(--glass-border)] rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:shadow-[var(--accent-glow)] hover:-translate-y-1 cursor-pointer group hover:border-[var(--primary-color)] hover:border-opacity-50 course-card-enter';
-                card.style.animationDelay = `${index * 0.05}s`;
                 card.style.animationDelay = `${index * 0.05}s`;
                 card.innerHTML = `
                     <div class="flex items-start gap-3">
@@ -1448,14 +1947,14 @@
                         </div>
 
                         <!-- 播放按钮 -->
-                        <a href="${course.url}" target="_blank" class="flex-shrink-0 w-9 h-9 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--primary-color)] flex items-center justify-center hover:bg-[var(--primary-color)] hover:text-white transition-all shadow-md" onclick="event.stopPropagation();">
+                        <div class="flex-shrink-0 w-9 h-9 rounded-full bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--primary-color)] flex items-center justify-center hover:bg-[var(--primary-color)] hover:text-white transition-all shadow-md" onclick="event.stopPropagation(); playVideo(${JSON.stringify(course).replace(/"/g, '&quot;')})">
                             <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
-                        </a>
+                        </div>
                     </div>
                 `;
-                card.onclick = () => window.open(course.url, '_blank');
+                card.onclick = () => playVideo(course);
                 grid.appendChild(card);
             });
         }
@@ -1524,7 +2023,7 @@
             renderCourses(courseData);
         }
 
-/* ========== 初始化 ========== */
+        /* ========== 初始化 ========== */
         function init() {
             // 初始化背景
             initBackground();
@@ -1546,7 +2045,7 @@
             // 显示欢迎提示
             setTimeout(() => {
                 initVideoArea();
-            showToast('2026法考备考助手已就绪！');
+                showToast('2026法考备考助手已就绪！');
             }, 1500);
         }
 
